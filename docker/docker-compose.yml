@@ -1,0 +1,57 @@
+
+services:
+
+  bank-api:
+    build:
+      context: ../
+      dockerfile: src/Bank.Server/Bank.Server.Api/Dockerfile.dev 
+    container_name: bank-api
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+    volumes:
+      - ../src:/src
+      - /src/Bank.Server/Bank.Server.Api/bin
+      - /src/Bank.Server/Bank.Server.Api/obj
+      - /src/Bank.Server/Bank.Server.Application/bin
+      - /src/Bank.Server/Bank.Server.Application/obj
+      - /src/Bank.Server/Bank.Server.Domain/bin
+      - /src/Bank.Server/Bank.Server.Domain/obj
+      - /src/Bank.Server/Bank.Server.Infrastructure/bin
+      - /src/Bank.Server/Bank.Server.Infrastructure/obj
+      - /src/BuildingBlocks.SharedKernel/bin
+      - /src/BuildingBlocks.SharedKernel/obj
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: bank-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="AccountContext\DomainEvents\" />
+    <Folder Include="AccountContext\Repositories\" />
+    <Folder Include="AccountContext\Specifications\" />
+    <Folder Include="AccountContext\ValueObjects\" />
+    <Folder Include="ATMContext\Aggregates\" />
+    <Folder Include="ATMContext\DomainEvents\" />
+    <Folder Include="ATMContext\Repositories\" />
+    <Folder Include="ATMContext\Specifications\" />
+    <Folder Include="ATMContext\ValueObjects\" />
+    <Folder Include="CardContext\DomainEvents\" />
+    <Folder Include="CardContext\Repositories\" />
+    <Folder Include="CardContext\Specifications\" />
+    <Folder Include="TransactionContext\DomainEvents\" />
+    <Folder Include="TransactionContext\Repositories\" />
+    <Folder Include="TransactionContext\Specifications\" />
+  </ItemGroup>
+
+</Project>

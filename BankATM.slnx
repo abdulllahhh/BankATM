@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Docker/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Docker/postgres/" />
+  <Folder Name="/Docker/seq/" />
+  <Folder Name="/src/">
+    <Project Path="src/BuildingBlocks.SharedKernel/BuildingBlocks.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Bank.Server/">
+    <Project Path="src/Bank.Server/Bank.Server.Api/Bank.Server.Api.csproj" />
+    <Project Path="src/Bank.Server/Bank.Server.Application/Bank.Server.Application.csproj" />
+    <Project Path="src/Bank.Server/Bank.Server.Domain/Bank.Server.Domain.csproj" />
+    <Project Path="src/Bank.Server/Bank.Server.Infrastructure/Bank.Server.Infrastructure.csproj" />
+  </Folder>
+</Solution>

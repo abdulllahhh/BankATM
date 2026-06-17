@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+WORKDIR /src
+
+# Install curl for healthcheck support
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Enable dotnet watch polling for containerized environments to capture file changes correctly
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+ENV ASPNETCORE_URLS=http://+:8080
+
+EXPOSE 8080
+
+# Run dotnet watch targeting the API project, ignoring launchSettings.json profiles inside the container to respect container env vars and ports
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "Bank.Server/Bank.Server.Api/Bank.Server.Api.csproj", "--no-launch-profile"]
+
