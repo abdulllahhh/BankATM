@@ -1,17 +1,48 @@
 ﻿using Bank.Server.Domain.CardContext.ValueObjects;
-
 namespace Bank.Server.Domain.CardContext.Aggregates
 {
-    public class Card
+
+    public sealed class Card
+        : AggregateRoot<Guid>
     {
-        public Guid Id { get; set; }
-        public string CardNumber { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public DateTime StartDate { get; set; }
+        private Card()
+        {
+        }
 
-        public CardStatus Status { get; set; }
-        public string PinHash { get; set; }
+        public CardNumber CardNumber { get; private set; }
 
-        public int FailedPinAttempts { get; set; }
+        public string PinHash { get; private set; }
+
+        public CardStatus Status { get; private set; }
+
+        public int FailedPinAttempts { get; private set; }
+
+        public DateOnly StartDate { get; private set; }
+
+        public DateOnly ExpiryDate { get; private set; }
+
+        public static Card Issue(
+            CardNumber cardNumber,
+            string pinHash,
+            DateOnly startDate,
+            DateOnly expiryDate)
+        {
+            var card = new Card
+            {
+                Id = Guid.NewGuid(),
+                CardNumber = cardNumber,
+                PinHash = pinHash,
+                Status = CardStatus.Active,
+                FailedPinAttempts = 0,
+                StartDate = startDate,
+                ExpiryDate = expiryDate
+            };
+
+            card.RaiseDomainEvent(
+                new CardIssuedDomainEvent(
+                    card.Id));
+
+            return card;
+        }
     }
 }

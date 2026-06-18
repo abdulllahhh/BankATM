@@ -2,6 +2,9 @@
 {
     public enum TransactionStatus
     {
-        Completed
+        Completed,
+        Approved,
+        Cancelled,
+        Pending
     }
 }

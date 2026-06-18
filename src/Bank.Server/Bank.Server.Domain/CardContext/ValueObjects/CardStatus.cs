@@ -6,5 +6,9 @@ namespace Bank.Server.Domain.CardContext.ValueObjects
 {
     public enum CardStatus
     {
+        Lost,
+        Stolen,
+        Confiscated,
+        Active
     }
 }

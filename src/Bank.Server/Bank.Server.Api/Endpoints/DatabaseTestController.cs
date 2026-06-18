@@ -1,4 +1,3 @@
-using Bank.Server.Domain.AccountContext.Aggregates;
 using Bank.Server.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,18 +1,63 @@
-﻿using Bank.Server.Domain.TransactionContext.ValueObjects;
+﻿using Bank.Server.Domain.AccountContext.ValueObjects;
+using Bank.Server.Domain.TransactionContext.DomainEvents;
+using Bank.Server.Domain.TransactionContext.ValueObjects;
 
 
 namespace Bank.Server.Domain.TransactionContext.Aggregates
 {
-    public class Transaction
+    public sealed class Transaction
+        : AggregateRoot<Guid>
     {
-        public Guid Id { get; set; }
-        public TransactionType Type { get; set; }
+        public TransactionStatus Status { get; private set; }
 
-        public decimal Amount { get; set; }
-        public Guid? FromAccountId { get; set; }
-        public Guid? ToAccountId { get; set; }
+        public TransactionType Type { get; private set; }
 
-        public TransactionStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public Money Amount { get; private set; }
+
+        public Guid? FromAccountId { get; private set; }
+
+        public Guid? ToAccountId { get; private set; }
+
+        public void Approve()
+        {
+            EnsurePending();
+
+            Status = TransactionStatus.Approved;
+
+            Raise(
+                new TransactionApprovedDomainEvent(Id));
+        }
+
+        public void Complete()
+        {
+            EnsureApproved();
+
+            Status = TransactionStatus.Completed;
+
+            Raise(
+                new TransactionCompletedDomainEvent(Id));
+        }
+
+        public void Cancel()
+        {
+            EnsurePending();
+
+            Status = TransactionStatus.Cancelled;
+
+            Raise(
+                new TransactionCancelledDomainEvent(Id));
+        }
+
+        private void EnsurePending()
+        {
+            if (Status != TransactionStatus.Pending)
+                throw new InvalidOperationException();
+        }
+
+        private void EnsureApproved()
+        {
+            if (Status != TransactionStatus.Approved)
+                throw new InvalidOperationException();
+        }
     }
 }

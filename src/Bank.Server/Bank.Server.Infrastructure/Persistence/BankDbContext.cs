@@ -1,5 +1,4 @@
-﻿using Bank.Server.Domain.AccountContext.Aggregates;
-using Bank.Server.Domain.CardContext.Aggregates;
+﻿
 using Bank.Server.Domain.TransactionContext.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
