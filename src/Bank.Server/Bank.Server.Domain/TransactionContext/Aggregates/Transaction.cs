@@ -24,7 +24,7 @@ namespace Bank.Server.Domain.TransactionContext.Aggregates
 
             Status = TransactionStatus.Approved;
 
-            Raise(
+            RaiseDomainEvent(
                 new TransactionApprovedDomainEvent(Id));
         }
 
@@ -34,7 +34,7 @@ namespace Bank.Server.Domain.TransactionContext.Aggregates
 
             Status = TransactionStatus.Completed;
 
-            Raise(
+            RaiseDomainEvent(
                 new TransactionCompletedDomainEvent(Id));
         }
 
@@ -44,7 +44,7 @@ namespace Bank.Server.Domain.TransactionContext.Aggregates
 
             Status = TransactionStatus.Cancelled;
 
-            Raise(
+            RaiseDomainEvent(
                 new TransactionCancelledDomainEvent(Id));
         }
 

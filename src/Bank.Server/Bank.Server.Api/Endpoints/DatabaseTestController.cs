@@ -1,3 +1,4 @@
+using Bank.Server.Domain.AccountContext.Aggregates;
 using Bank.Server.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,14 +31,15 @@ namespace Bank.Server.Api.Endpoints
         [ProducesResponseType(typeof(Account), StatusCodes.Status200OK)]
         public async Task<IActionResult> SeedTestAccount()
         {
-            var account = new Account
+            var account = Account.Create()
             {
                 Id = Guid.NewGuid(),
                 AccountNumber = $"ACC-{Guid.NewGuid().ToString()[..8].ToUpper()}",
                 Balance = 1000.00m,
                 DailyLimit = 500.00m,
                 WithdrawnToday = 0.00m
-            };
+            }
+            ;
 
             _context.Accounts.Add(account);
             await _context.SaveChangesAsync();

@@ -21,8 +21,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Status)
             .IsRequired();
 
-        builder.Property(t => t.CreatedAt)
-            .IsRequired();
+
 
         builder.Property(t => t.FromAccountId)
             .IsRequired(false);

@@ -28,7 +28,7 @@ namespace Bank.Server.Domain.ATMContext.Aggregates
             CashAvailable =
                 CashAvailable.Subtract(amount);
 
-            Raise(
+            RaiseDomainEvent(
                 new CashDispensedDomainEvent(
                     Id,
                     amount.Amount));
@@ -41,7 +41,7 @@ namespace Bank.Server.Domain.ATMContext.Aggregates
             CashAvailable =
                 CashAvailable.Add(amount);
 
-            Raise(
+            RaiseDomainEvent(
                 new CashLoadedDomainEvent(
                     Id,
                     amount.Amount));

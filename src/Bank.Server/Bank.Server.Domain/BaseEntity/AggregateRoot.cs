@@ -1,7 +1,7 @@
-﻿using BuildingBlocks.SharedKernel;
+﻿using Bank.Server.Domain.BaseEntity;
+using BuildingBlocks.SharedKernel;
 using BuildingBlocks.SharedKernel.DomainEvents;
-
-public abstract class AggregateRoot<TId> : Entity<TId>
+public abstract class AggregateRoot<TId> : Entity<TId>, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 

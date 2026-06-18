@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+
 
 namespace BuildingBlocks.SharedKernel.DomainEvents
 {
-    public interface IDomainEvent
+    public interface IDomainEvent : INotification
     {
         DateTime OccurredOnUtc { get; }
     }

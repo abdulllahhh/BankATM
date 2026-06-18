@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bank.Server.Domain.TransactionContext.DomainEvents
+namespace Bank.Server.Domain.CardContext.DomainEvents
 {
-    public sealed record TransactionApprovedDomainEvent(
-        Guid TransactionId)
+    public sealed record CardIssuedDomainEvent(
+        Guid CardId)
         : DomainEvent;
 }

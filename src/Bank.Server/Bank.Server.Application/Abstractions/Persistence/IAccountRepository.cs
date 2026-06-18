@@ -1,4 +1,5 @@
-﻿using Bank.Server.Domain.AccountContext.ValueObjects;
+﻿using Bank.Server.Domain.AccountContext.Aggregates;
+using Bank.Server.Domain.AccountContext.ValueObjects;
 
 namespace Bank.Server.Application.Abstractions.Persistence;
 

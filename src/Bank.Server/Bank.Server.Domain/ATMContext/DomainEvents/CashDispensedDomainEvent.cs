@@ -1,10 +1,12 @@
-﻿using System;
+﻿using BuildingBlocks.SharedKernel.DomainEvents;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Bank.Server.Domain.ATMContext.DomainEvents
 {
-    public class CashDispensedDomainEvent
-    {
-    }
+    public sealed record CashDispensedDomainEvent(
+        Guid AtmId,
+        decimal Amount)
+        : DomainEvent;
 }

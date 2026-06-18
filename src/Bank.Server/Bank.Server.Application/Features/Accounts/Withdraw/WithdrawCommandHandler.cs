@@ -1,5 +1,4 @@
 ﻿using Bank.Server.Application.Abstractions.Persistence;
-using Bank.Server.Application.Common.Models;
 using Bank.Server.Domain.AccountContext.ValueObjects;
 using MediatR;
 

@@ -1,5 +1,4 @@
-﻿using Bank.Server.Application.Common.Models;
-using MediatR;
+﻿using MediatR;
 
 namespace Bank.Server.Application.Common.Interfaces;
 

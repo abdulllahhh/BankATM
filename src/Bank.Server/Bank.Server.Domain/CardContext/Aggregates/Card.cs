@@ -1,4 +1,5 @@
-﻿using Bank.Server.Domain.CardContext.ValueObjects;
+﻿using Bank.Server.Domain.CardContext.DomainEvents;
+using Bank.Server.Domain.CardContext.ValueObjects;
 namespace Bank.Server.Domain.CardContext.Aggregates
 {
 

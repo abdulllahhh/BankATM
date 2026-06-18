@@ -1,4 +1,5 @@
-﻿using Bank.Server.Infrastructure.Persistence;
+﻿using Bank.Server.Infrastructure.DomainEvent;
+using Bank.Server.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,11 +12,16 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<BankDbContext>(options =>
+        services.AddDbContext<BankDbContext>(
+        (sp, options) =>
         {
-            options.UseNpgsql(
-                configuration.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+
+            options.AddInterceptors(
+                sp.GetRequiredService<
+                    PublishDomainEventsInterceptor>());
         });
+        services.AddScoped<PublishDomainEventsInterceptor>();
 
         return services;
     }
