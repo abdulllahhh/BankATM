@@ -14,6 +14,7 @@ namespace Bank.Server.Domain.AccountContext.ValueObjects
         {
             Value = value;
         }
+        private AccountNumber() { }
 
         public static AccountNumber Create(string value)
         {

@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.SharedKernel.DomainEvents;
+﻿using Bank.Server.Domain.Common;
+using BuildingBlocks.SharedKernel.DomainEvents;
 using System;
 using System.Collections.Generic;
 using System.Text;

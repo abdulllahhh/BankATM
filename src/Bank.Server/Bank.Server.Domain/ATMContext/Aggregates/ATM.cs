@@ -9,6 +9,7 @@ namespace Bank.Server.Domain.ATMContext.Aggregates
     public sealed class ATM : AggregateRoot<Guid>
     {
         public Money CashAvailable { get; private set; }
+        public ATMIdentifier ATMIdentifier { get; private set; }
 
         public ATMStatus Status { get; private set; }
 

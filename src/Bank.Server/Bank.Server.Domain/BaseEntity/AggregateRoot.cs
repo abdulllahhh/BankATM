@@ -1,4 +1,5 @@
 ﻿using Bank.Server.Domain.BaseEntity;
+using Bank.Server.Domain.Common;
 using BuildingBlocks.SharedKernel;
 using BuildingBlocks.SharedKernel.DomainEvents;
 public abstract class AggregateRoot<TId> : Entity<TId>, IAggregateRoot
