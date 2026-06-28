@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.SharedKernel.DomainEvents;
+﻿using Bank.Server.Domain.Common;
+using BuildingBlocks.SharedKernel.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

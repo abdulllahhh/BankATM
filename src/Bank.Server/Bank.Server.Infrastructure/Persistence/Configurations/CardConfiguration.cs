@@ -11,13 +11,18 @@ public class CardConfiguration : IEntityTypeConfiguration<Card>
         builder.ToTable("Cards");
 
         builder.HasKey(c => c.Id);
+        builder.OwnsOne(
+            x => x.CardNumber,
+            cardNumber =>
+            {
+                cardNumber.Property(x => x.Value)
+                    .HasColumnName("CardNumber")
+                    .HasMaxLength(20)
+                    .IsRequired();
 
-        builder.Property(c => c.CardNumber)
-            .IsRequired()
-            .HasMaxLength(20);
-
-        builder.HasIndex(c => c.CardNumber)
-            .IsUnique();
+                cardNumber.HasIndex(x => x.Value)
+                           .IsUnique();
+            });
 
         builder.Property(c => c.PinHash)
             .IsRequired();

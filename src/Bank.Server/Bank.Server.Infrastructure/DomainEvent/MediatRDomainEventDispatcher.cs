@@ -1,4 +1,6 @@
-﻿using Bank.Server.Application.Common.Interfaces;
+﻿using Bank.Server.Application.Abstractions.Messaging;
+using Bank.Server.Application.Common.Interfaces;
+using Bank.Server.Domain.Common;
 using BuildingBlocks.SharedKernel.DomainEvents;
 using MediatR;
 

@@ -1,26 +1,16 @@
-﻿using Bank.Server.Application.Common.Interfaces;
+﻿using Bank.Server.Application.Abstractions.Messaging;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Bank.Server.Infrastructure.DomainEvent
 {
-    public sealed class PublishDomainEventsInterceptor
-        : SaveChangesInterceptor
+    public sealed class PublishDomainEventsInterceptor(
+        IDomainEventDispatcher dispatcher)
+                : SaveChangesInterceptor
     {
         private readonly IDomainEventDispatcher
-            _dispatcher;
-
-        public PublishDomainEventsInterceptor(
-            IDomainEventDispatcher dispatcher)
-        {
             _dispatcher = dispatcher;
-        }
 
-        public override async ValueTask<
-            int> SavedChangesAsync(
-            SaveChangesCompletedEventData eventData,
+        public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData,
             int result,
             CancellationToken cancellationToken = default)
         {
