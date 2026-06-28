@@ -1,3 +1,4 @@
+using Bank.Server.Application;
 using Bank.Server.Application.Handlers;
 using Bank.Server.Infrastructure;
 using Bank.Server.Infrastructure.Persistence;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 builder.Services.AddTransient<WithdrawCommandHandler>();
 builder.Services.AddHealthChecks();
 
@@ -28,7 +30,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        // FIX: Remove string.Empty so Swagger UI lives comfortably at /swagger
         options.RoutePrefix = "swagger";
     });
 }

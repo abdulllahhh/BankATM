@@ -1,4 +1,5 @@
 using Bank.Server.Domain.AccountContext.Aggregates;
+using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,20 +30,19 @@ namespace Bank.Server.Api.Endpoints
         /// <returns>The created test account details.</returns>
         [HttpPost("seed-test-account")]
         [ProducesResponseType(typeof(Account), StatusCodes.Status200OK)]
-        public async Task<IActionResult> SeedTestAccount()
+        public async Task<IActionResult> SeedTestAccount(CancellationToken cancellationToken)
         {
-            var account = Account.Create()
-            {
-                Id = Guid.NewGuid(),
-                AccountNumber = $"ACC-{Guid.NewGuid().ToString()[..8].ToUpper()}",
-                Balance = 1000.00m,
-                DailyLimit = 500.00m,
-                WithdrawnToday = 0.00m
-            }
-            ;
+            var accountNumber = AccountNumber.Create($"ACC-{Guid.NewGuid().ToString()[..8].ToUpper()}");
+            var openingBalance = Money.Create(1000.00m, "USD");
+            var dailyLimit = Money.Create(500.00m, "USD");
+
+            var account = Account.Create(
+                accountNumber,
+                openingBalance,
+                dailyLimit);
 
             _context.Accounts.Add(account);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return Ok(account);
         }
