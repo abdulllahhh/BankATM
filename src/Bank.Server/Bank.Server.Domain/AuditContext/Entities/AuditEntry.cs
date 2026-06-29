@@ -1,5 +1,5 @@
 ﻿using Bank.Server.Domain.AuditContext.ValueObjects;
-using BuildingBlocks.Domain;
+using BuildingBlocks.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;

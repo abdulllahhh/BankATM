@@ -1,5 +1,5 @@
 using Bank.Server.Domain.AuditContext.Entities;
-using BuildingBlocks.Domain;
+using BuildingBlocks.Domain.Common;
 
 namespace Bank.Server.Domain.AuditContext.Aggregates
 {

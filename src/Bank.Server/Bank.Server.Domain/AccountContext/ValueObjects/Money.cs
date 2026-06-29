@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain;
+﻿using BuildingBlocks.Domain.Common;
 
 
 namespace Bank.Server.Domain.AccountContext.ValueObjects

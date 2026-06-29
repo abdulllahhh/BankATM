@@ -1,6 +1,6 @@
 ﻿using Bank.Server.Domain.CardContext.DomainEvents;
 using Bank.Server.Domain.CardContext.ValueObjects;
-using BuildingBlocks.Domain;
+using BuildingBlocks.Domain.Common;
 namespace Bank.Server.Domain.CardContext.Aggregates
 {
 

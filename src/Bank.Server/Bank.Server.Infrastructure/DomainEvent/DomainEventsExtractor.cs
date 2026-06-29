@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Domain;
+﻿using BuildingBlocks.Domain.Common;
+using BuildingBlocks.Domain.Events;
 using BuildingBlocks.SharedKernel.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using System;

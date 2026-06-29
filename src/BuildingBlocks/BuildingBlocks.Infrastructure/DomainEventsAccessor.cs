@@ -1,7 +1,8 @@
-﻿using BuildingBlocks.Domain;
+﻿using BuildingBlocks.Domain.Common;
+using BuildingBlocks.Domain.Events;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.Server.Infrastructure.Persistence;
+namespace BuildingBlocks.Infrastructure;
 
 public sealed class DomainEventsAccessor
 {

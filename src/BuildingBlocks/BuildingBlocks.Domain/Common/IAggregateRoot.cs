@@ -1,4 +1,6 @@
-﻿namespace BuildingBlocks.Domain
+﻿using BuildingBlocks.Domain.Events;
+
+namespace BuildingBlocks.Domain.Common
 {
     public interface IAggregateRoot
     {

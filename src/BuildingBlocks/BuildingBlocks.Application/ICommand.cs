@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain;
+﻿using BuildingBlocks.Domain.Common;
 using MediatR;
 
 namespace BuildingBlocks.Application;

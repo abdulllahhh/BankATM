@@ -1,5 +1,5 @@
 ﻿using Bank.Server.Application.Abstractions.Messaging;
-using BuildingBlocks.Domain;
+using BuildingBlocks.Domain.Common;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Bank.Server.Infrastructure.Persistence.Interceptors;
