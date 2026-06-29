@@ -1,7 +1,7 @@
 ﻿
 using Bank.Server.Domain.AccountContext.Aggregates;
 using Bank.Server.Domain.ATMContext.Aggregates;
-using Bank.Server.Domain.AuditLog;
+using Bank.Server.Domain.AuditContext.Aggregates;
 using Bank.Server.Domain.CardContext.Aggregates;
 using Bank.Server.Domain.TransactionContext.Aggregates;
 using Microsoft.EntityFrameworkCore;

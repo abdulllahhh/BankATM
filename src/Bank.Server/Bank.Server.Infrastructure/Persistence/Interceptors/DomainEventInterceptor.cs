@@ -1,6 +1,5 @@
 ﻿using Bank.Server.Application.Abstractions.Messaging;
-using Bank.Server.Domain.Common;
-using Microsoft.EntityFrameworkCore;
+using BuildingBlocks.Domain;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Bank.Server.Infrastructure.Persistence.Interceptors;
@@ -37,7 +36,7 @@ public sealed class DomainEventInterceptor
             entity.Entity.ClearDomainEvents();
         }
 
-        await _dispatcher.DispatchAsync(domainEvents, cancellationToken);
+        await _dispatcher.DispatchAsync(cancellationToken);
 
         return result;
     }

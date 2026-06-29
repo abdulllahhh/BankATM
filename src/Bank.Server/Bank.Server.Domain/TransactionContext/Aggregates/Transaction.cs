@@ -1,6 +1,7 @@
 ﻿using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Domain.TransactionContext.DomainEvents;
 using Bank.Server.Domain.TransactionContext.ValueObjects;
+using BuildingBlocks.Domain;
 
 
 namespace Bank.Server.Domain.TransactionContext.Aggregates

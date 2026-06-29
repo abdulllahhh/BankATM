@@ -1,4 +1,5 @@
-﻿using Bank.Server.Application.Common.Interfaces;
+﻿
+using BuildingBlocks.Application;
 
 namespace Bank.Server.Application.Features.Accounts.Withdraw;
 

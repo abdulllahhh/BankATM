@@ -1,4 +1,4 @@
-﻿using Bank.Server.Application.Common.Behaviors;
+﻿using BuildingBlocks.Application.Behaviors;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

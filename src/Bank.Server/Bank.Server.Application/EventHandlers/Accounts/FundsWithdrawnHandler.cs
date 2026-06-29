@@ -1,8 +1,8 @@
-﻿using Bank.Server.Application.Abstractions.Persistence;
-using Bank.Server.Domain.AccountContext.DomainEvents;
-using Bank.Server.Domain.AuditLog;
+﻿using Bank.Server.Domain.AccountContext.DomainEvents;
+using BuildingBlocks.Application;
 using MediatR;
 using System.Text.Json;
+namespace Bank.Server.Application.EventHandlers.Accounts;
 
 public sealed class FundsWithdrawnHandler : INotificationHandler<FundsWithdrawnDomainEvent>
 {
@@ -17,13 +17,13 @@ public sealed class FundsWithdrawnHandler : INotificationHandler<FundsWithdrawnD
         FundsWithdrawnDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        var audit = new AuditLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = nameof(FundsWithdrawnDomainEvent),
-            Data = JsonSerializer.Serialize(notification),
-            CreatedAtUtc = DateTime.UtcNow
-        };
+        //var audit = new AuditLog
+        //{
+        //    Id = Guid.NewGuid(),
+        //    EventType = nameof(FundsWithdrawnDomainEvent),
+        //    Data = JsonSerializer.Serialize(notification),
+        //    CreatedAtUtc = DateTime.UtcNow
+        //};
 
         // ❗ Still missing DbSet access → FIX BELOW
     }

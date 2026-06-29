@@ -1,5 +1,4 @@
-﻿using Bank.Server.Domain.AuditLog;
-using Microsoft.EntityFrameworkCore;
+﻿using Bank.Server.Domain.AuditContext.Aggregates;
 
 namespace Bank.Server.Infrastructure.Persistence.Repositories;
 

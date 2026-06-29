@@ -1,5 +1,6 @@
 ﻿using Bank.Server.Domain.AccountContext.DomainEvents;
 using Bank.Server.Domain.AccountContext.ValueObjects;
+using BuildingBlocks.Domain;
 
 namespace Bank.Server.Domain.AccountContext.Aggregates
 {

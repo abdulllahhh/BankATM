@@ -4,7 +4,10 @@
   </Folder>
   <Folder Name="/Docker/postgres/" />
   <Folder Name="/Docker/seq/" />
+  <Folder Name="/docs/" />
+  <Folder Name="/scripts/" />
   <Folder Name="/src/">
+    <Project Path="src/ATM.Client/ATM.Client.csproj" />
     <Project Path="src/BuildingBlocks.SharedKernel/BuildingBlocks.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Bank.Server/">
@@ -13,4 +16,15 @@
     <Project Path="src/Bank.Server/Bank.Server.Domain/Bank.Server.Domain.csproj" />
     <Project Path="src/Bank.Server/Bank.Server.Infrastructure/Bank.Server.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Contracts/BuildingBlocks.Contracts.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Persistence/BuildingBlocks.Persistence.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Security/BuildingBlocks.Security.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" />
 </Solution>

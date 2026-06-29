@@ -9,11 +9,15 @@
   <ItemGroup>
     <Folder Include="ATMContext\Repositories\" />
     <Folder Include="ATMContext\Specifications\" />
+    <Folder Include="BaseEntity\" />
     <Folder Include="TransactionContext\Specifications\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
   </ItemGroup>
+
+
 
 </Project>

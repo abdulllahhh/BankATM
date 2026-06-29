@@ -22,7 +22,7 @@ namespace Bank.Server.Infrastructure.DomainEvent
                     eventData.Context);
 
             await _dispatcher.DispatchAsync(
-                domainEvents,
+                //domainEvents,
                 cancellationToken);
 
             return result;

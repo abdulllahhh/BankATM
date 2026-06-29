@@ -1,7 +1,5 @@
-﻿using Bank.Server.Domain.BaseValueObject;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BuildingBlocks.Domain;
+
 
 namespace Bank.Server.Domain.AccountContext.ValueObjects
 {

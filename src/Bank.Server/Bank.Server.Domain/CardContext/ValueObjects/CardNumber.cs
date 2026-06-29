@@ -1,9 +1,4 @@
-﻿using Bank.Server.Domain.AccountContext.ValueObjects;
-using Bank.Server.Domain.BaseValueObject;
-using BuildingBlocks.SharedKernel.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BuildingBlocks.Domain;
 
 namespace Bank.Server.Domain.CardContext.ValueObjects
 {

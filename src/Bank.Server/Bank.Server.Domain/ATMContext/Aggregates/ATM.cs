@@ -1,8 +1,7 @@
 ﻿using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Domain.ATMContext.DomainEvents;
 using Bank.Server.Domain.ATMContext.ValueObjects;
-using Bank.Server.Domain.BaseValueObject;
-
+using BuildingBlocks.Domain;
 
 namespace Bank.Server.Domain.ATMContext.Aggregates
 {

@@ -1,4 +1,4 @@
-﻿using Bank.Server.Domain.Common;
+﻿using BuildingBlocks.Domain;
 using System;
 using System.Collections.Generic;
 using System.Text;

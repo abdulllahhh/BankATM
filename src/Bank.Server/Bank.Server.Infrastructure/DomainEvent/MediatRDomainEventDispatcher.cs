@@ -1,7 +1,5 @@
 ﻿using Bank.Server.Application.Abstractions.Messaging;
-using Bank.Server.Application.Common.Interfaces;
-using Bank.Server.Domain.Common;
-using BuildingBlocks.SharedKernel.DomainEvents;
+using BuildingBlocks.Domain;
 using MediatR;
 
 
@@ -19,15 +17,15 @@ namespace Bank.Server.Infrastructure.DomainEvent
         }
 
         public async Task DispatchAsync(
-            IEnumerable<IDomainEvent> domainEvents,
+            //IEnumerable<IDomainEvent> domainEvents,
             CancellationToken cancellationToken)
         {
-            foreach (var domainEvent in domainEvents)
-            {
-                await _mediator.Publish(
-                    domainEvent,
-                    cancellationToken);
-            }
+            //foreach (var domainEvent in domainEvents)
+            //{
+            //    await _mediator.Publish(
+            //        domainEvent,
+            //        cancellationToken);
+            //}
         }
     }
 }

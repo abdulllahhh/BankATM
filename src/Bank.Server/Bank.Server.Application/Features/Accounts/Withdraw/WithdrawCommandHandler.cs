@@ -1,5 +1,6 @@
 ﻿using Bank.Server.Application.Abstractions.Persistence;
 using Bank.Server.Domain.AccountContext.ValueObjects;
+using BuildingBlocks.Domain;
 using MediatR;
 
 namespace Bank.Server.Application.Features.Accounts.Withdraw;
