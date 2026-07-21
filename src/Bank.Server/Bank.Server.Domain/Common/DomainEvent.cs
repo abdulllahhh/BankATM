@@ -9,5 +9,7 @@ namespace BuildingBlocks.SharedKernel.DomainEvents
     {
         public DateTime OccurredOnUtc { get; init; } =
             DateTime.UtcNow;
+
+        public Guid EventId => throw new NotImplementedException();
     }
 }
