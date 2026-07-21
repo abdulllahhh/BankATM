@@ -3,7 +3,6 @@ using Bank.Server.Application.Abstractions.Persistence;
 using Bank.Server.Infrastructure.DomainEvent;
 using Bank.Server.Infrastructure.Messaging;
 using Bank.Server.Infrastructure.Persistence;
-using Bank.Server.Infrastructure.Persistence.Interceptors;
 using Bank.Server.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,17 +16,11 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<PublishDomainEventsInterceptor>();
         services.AddDbContext<BankDbContext>(
             (sp, options) =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-
-            options.AddInterceptors(
-                sp.GetRequiredService<
-                    PublishDomainEventsInterceptor>());
         });
-        services.AddScoped<DomainEventInterceptor>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         //services.AddScoped<DomainEventsAccessor>();
         services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();

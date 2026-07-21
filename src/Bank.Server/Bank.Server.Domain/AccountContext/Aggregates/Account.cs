@@ -1,4 +1,4 @@
-﻿using Bank.Server.Domain.AccountContext.DomainEvents;
+using Bank.Server.Domain.AccountContext.DomainEvents;
 using Bank.Server.Domain.AccountContext.ValueObjects;
 using BuildingBlocks.Domain.Common;
 
@@ -46,9 +46,38 @@ namespace Bank.Server.Domain.AccountContext.Aggregates
             return account;
         }
 
-        public Result Withdraw(Money amount)
+        public Result Withdraw(Money amount, Guid transactionId = default)
         {
-            // business rules here
+            if (transactionId == Guid.Empty)
+            {
+                transactionId = Guid.NewGuid();
+            }
+
+            if (Status != AccountStatus.Active)
+            {
+                return Result.Failure("Account is not active.");
+            }
+
+            if (Balance.Currency != amount.Currency)
+            {
+                return Result.Failure("Currency mismatch.");
+            }
+
+            if (WithdrawnToday.Amount + amount.Amount > DailyLimit.Amount)
+            {
+                RaiseDomainEvent(new DailyLimitExceededDomainEvent());
+                return Result.Failure("Daily withdrawal limit exceeded.");
+            }
+
+            if (Balance.Amount < amount.Amount)
+            {
+                return Result.Failure("Insufficient funds.");
+            }
+
+            Balance = Balance.Subtract(amount);
+            WithdrawnToday = WithdrawnToday.Add(amount);
+
+            RaiseDomainEvent(new FundsWithdrawnDomainEvent(Id, amount.Amount, transactionId));
 
             return Result.Success();
         }

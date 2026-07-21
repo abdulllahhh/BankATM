@@ -1,4 +1,4 @@
-﻿using Bank.Server.Domain.ATMContext.Aggregates;
+using Bank.Server.Domain.ATMContext.Aggregates;
 
 namespace Bank.Server.Application.Abstractions.Persistence;
 

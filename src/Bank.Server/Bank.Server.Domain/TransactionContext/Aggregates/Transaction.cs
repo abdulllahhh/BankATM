@@ -1,4 +1,4 @@
-﻿using Bank.Server.Domain.AccountContext.ValueObjects;
+using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Domain.TransactionContext.DomainEvents;
 using Bank.Server.Domain.TransactionContext.ValueObjects;
 using BuildingBlocks.Domain.Common;
