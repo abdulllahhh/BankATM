@@ -46,8 +46,13 @@ namespace Bank.Server.Domain.AccountContext.Aggregates
             return account;
         }
 
-        public Result Withdraw(Money amount, Guid transactionId = default)
+        public Result Withdraw(Money amount, Guid atmId, Guid transactionId = default)
         {
+            if (atmId == Guid.Empty)
+            {
+                return Result.Failure("ATM id is required.");
+            }
+
             if (transactionId == Guid.Empty)
             {
                 transactionId = Guid.NewGuid();
@@ -77,7 +82,12 @@ namespace Bank.Server.Domain.AccountContext.Aggregates
             Balance = Balance.Subtract(amount);
             WithdrawnToday = WithdrawnToday.Add(amount);
 
-            RaiseDomainEvent(new FundsWithdrawnDomainEvent(Id, amount.Amount, transactionId));
+            RaiseDomainEvent(new FundsWithdrawnDomainEvent(
+                Id,
+                atmId,
+                amount.Amount,
+                amount.Currency,
+                transactionId));
 
             return Result.Success();
         }

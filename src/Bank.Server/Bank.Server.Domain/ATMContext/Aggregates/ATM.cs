@@ -36,6 +36,9 @@ namespace Bank.Server.Domain.ATMContext.Aggregates
             return Result.Success();
         }
 
+        public Result DecreaseCashInventory(Money amount)
+            => DispenseCash(amount);
+
         public void LoadCash(Money amount)
         {
             CashAvailable =

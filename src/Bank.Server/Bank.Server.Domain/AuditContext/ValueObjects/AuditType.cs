@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Bank.Server.Domain.AuditContext.ValueObjects
 {
-    internal class AuditType
+    public sealed class AuditType
     {
     }
 }

@@ -7,7 +7,4 @@ public interface IATMRepository
     Task<ATM?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken);
-
-    Task SaveChangesAsync(
-        CancellationToken cancellationToken);
 }

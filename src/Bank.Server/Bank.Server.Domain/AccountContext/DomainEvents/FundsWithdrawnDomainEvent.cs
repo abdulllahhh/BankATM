@@ -8,7 +8,9 @@ namespace Bank.Server.Domain.AccountContext.DomainEvents
 {
     public sealed record FundsWithdrawnDomainEvent(
         Guid AccountId,
+        Guid AtmId,
         decimal Amount,
+        string Currency,
         Guid TransactionId)
         : DomainEvent, INotification;
 }

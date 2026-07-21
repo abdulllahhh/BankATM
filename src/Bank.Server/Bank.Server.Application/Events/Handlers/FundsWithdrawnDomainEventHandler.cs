@@ -2,11 +2,8 @@ using Bank.Server.Domain.AccountContext.DomainEvents;
 using Bank.Server.Domain.AuditContext.Aggregates;
 using Bank.Server.Domain.AuditContext.Repositories;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Bank.Server.Application.EventHandlers.Accounts;
+namespace Bank.Server.Application.Events.Handlers;
 
 public sealed class FundsWithdrawnDomainEventHandler
     : INotificationHandler<FundsWithdrawnDomainEvent>
@@ -33,10 +30,5 @@ public sealed class FundsWithdrawnDomainEventHandler
             correlationId: notification.TransactionId);
 
         await _auditLogRepository.AddAsync(auditLog, cancellationToken);
-
-        // ❌ No SaveChanges or Commit here.
-        // The AuditLog entity is now tracked by EF Core.
-        // UnitOfWork.SaveChangesAsync (Phase 5) will detect HasChanges()
-        // and persist it within the same open transaction.
     }
 }
