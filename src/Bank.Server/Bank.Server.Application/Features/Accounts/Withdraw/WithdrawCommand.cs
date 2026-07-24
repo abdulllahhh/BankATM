@@ -1,5 +1,5 @@
 ﻿
-using BuildingBlocks.Application;
+using BuildingBlocks.Application.CQRS;
 
 namespace Bank.Server.Application.Features.Accounts.Withdraw;
 
