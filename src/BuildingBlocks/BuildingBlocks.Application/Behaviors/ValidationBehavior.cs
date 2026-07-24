@@ -1,7 +1,6 @@
-﻿using BuildingBlocks.Application.Results;
-using BuildingBlocks.Application.Validation;
+﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
-using System.Reflection;
 
 namespace BuildingBlocks.Application.Behaviors;
 
@@ -19,41 +18,18 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        var failures = new List<ValidationError>();
+        var failures = new List<ValidationFailure>();
 
         foreach (var validator in _validators)
         {
             var result = await validator.ValidateAsync(request, cancellationToken);
 
-            if (!result.IsValid)
-            {
-                failures.AddRange(result.Errors);
-            }
+            failures.AddRange(result.Errors);
         }
 
         if (failures.Count > 0)
-        {
-            var error = new Error("VALIDATION.FAILED", "One or more validation errors occurred.");
-            return CreateFailureResult(error);
-        }
+            throw new ValidationException(failures);
 
         return await next();
-    }
-
-    private static TResponse CreateFailureResult(Error error)
-    {
-        if (typeof(TResponse) == typeof(Result))
-        {
-            return (TResponse)(object)Result.Failure(error);
-        }
-
-        var valueType = typeof(TResponse).GetGenericArguments()[0];
-        var method = typeof(Result)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .First(m => m.Name == "Failure" && m.IsGenericMethodDefinition);
-
-        return (TResponse)(object)method
-            .MakeGenericMethod(valueType)
-            .Invoke(null, [error])!;
     }
 }
