@@ -2,9 +2,12 @@ using BuildingBlocks.Application.Abstractions.Persistence;
 using BuildingBlocks.Application.Specifications;
 using BuildingBlocks.Domain.Common;
 
-namespace BuildingBlocks.Infrastructure.Persistence.Repositories;
+namespace BuildingBlocks.Infrastructure.Persistence;
 
-public class ReadRepository<TAggregate, TId> : IReadRepository<TAggregate, TId>
+/// <summary>
+/// Base class for read-only aggregate repositories. Derived classes provide the DbContext instance.
+/// </summary>
+public abstract class ReadRepositoryBase<TAggregate, TId> : IReadRepository<TAggregate, TId>
     where TAggregate : AggregateRoot<TId>
     where TId : notnull
 {

@@ -4,8 +4,7 @@ using Bank.Server.Infrastructure.Persistence;
 using Bank.Server.Infrastructure.Persistence.Repositories;
 using BuildingBlocks.Application.Abstractions.Messaging;
 using BuildingBlocks.Application.Abstractions.Persistence;
-using BuildingBlocks.Infrastructure.Events;
-using BuildingBlocks.Infrastructure.Messaging;
+using BuildingBlocks.Infrastructure.Dispatching;
 using BuildingBlocks.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +25,6 @@ public static class DependencyInjection
             });
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<BankDbContext>());
-        services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

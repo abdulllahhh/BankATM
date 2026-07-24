@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
-public class PublishDomainEventsInterceptor : SaveChangesInterceptor
+/// <summary>
+/// Captures domain events from aggregates before save and dispatches them after save.
+/// </summary>
+public sealed class PublishDomainEventsInterceptor : SaveChangesInterceptor
 {
 }

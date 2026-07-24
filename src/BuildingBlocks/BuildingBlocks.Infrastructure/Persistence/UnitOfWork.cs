@@ -7,6 +7,9 @@ using Result = BuildingBlocks.Application.Results.Result;
 
 namespace BuildingBlocks.Infrastructure.Persistence;
 
+/// <summary>
+/// Commits tracked changes and dispatches domain events within a single business transaction.
+/// </summary>
 public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly DbContext _dbContext;
