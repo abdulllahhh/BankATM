@@ -2,7 +2,7 @@ namespace BuildingBlocks.Application.Results;
 
 public sealed class Result<T>
 {
-    private readonly T? _value;
+    private readonly T? _value = default;
 
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
@@ -20,6 +20,11 @@ public sealed class Result<T>
 
     private Result(Error error)
     {
+        if (error == Error.None)
+        {
+            throw new ArgumentException("Failure result must have a non-none error.", nameof(error));
+        }
+
         IsSuccess = false;
         Error = error;
         _value = default;
