@@ -1,0 +1,220 @@
+diff --git a/src/Bank.Server/Bank.Server.Application/Abstractions/Messaging/IDomainEventDispatcher.cs b/src/Bank.Server/Bank.Server.Application/Abstractions/Messaging/IDomainEventDispatcher.cs
+index 7b29b4a..f10d12b 100644
+--- a/src/Bank.Server/Bank.Server.Application/Abstractions/Messaging/IDomainEventDispatcher.cs
++++ b/src/Bank.Server/Bank.Server.Application/Abstractions/Messaging/IDomainEventDispatcher.cs
+@@ -1,6 +1,10 @@
+-﻿namespace Bank.Server.Application.Abstractions.Messaging;
++﻿using BuildingBlocks.Domain.Events;
++
++namespace Bank.Server.Application.Abstractions.Messaging;
+ 
+ public interface IDomainEventDispatcher
+ {
+-    Task DispatchAsync(CancellationToken cancellationToken);
++    Task DispatchAsync(
++        IReadOnlyCollection<IDomainEvent> domainEvents,
++        CancellationToken cancellationToken = default);
+ }
+\ No newline at end of file
+diff --git a/src/Bank.Server/Bank.Server.Application/DependencyInjection.cs b/src/Bank.Server/Bank.Server.Application/DependencyInjection.cs
+index 3dcc10c..c4db61e 100644
+--- a/src/Bank.Server/Bank.Server.Application/DependencyInjection.cs
++++ b/src/Bank.Server/Bank.Server.Application/DependencyInjection.cs
+@@ -19,7 +19,6 @@ public static class DependencyInjection
+         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+ 
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+diff --git a/src/Bank.Server/Bank.Server.Infrastructure/DependencyInjection/DependencyInjection.cs b/src/Bank.Server/Bank.Server.Infrastructure/DependencyInjection/DependencyInjection.cs
+index d81af69..2d2be77 100644
+--- a/src/Bank.Server/Bank.Server.Infrastructure/DependencyInjection/DependencyInjection.cs
++++ b/src/Bank.Server/Bank.Server.Infrastructure/DependencyInjection/DependencyInjection.cs
+@@ -2,8 +2,8 @@ using Bank.Server.Application.Abstractions.Persistence;
+ using Bank.Server.Domain.AuditContext.Repositories;
+ using Bank.Server.Infrastructure.Persistence;
+ using Bank.Server.Infrastructure.Persistence.Repositories;
+-using BuildingBlocks.Application;
+ using BuildingBlocks.Application.Abstractions.Messaging;
++using BuildingBlocks.Application.Abstractions.Persistence;
+ using BuildingBlocks.Infrastructure.Events;
+ using BuildingBlocks.Infrastructure.Messaging;
+ using BuildingBlocks.Infrastructure.Persistence;
+diff --git a/src/Bank.Server/Bank.Server.Infrastructure/DomainEvent/MediatRDomainEventDispatcher.cs b/src/Bank.Server/Bank.Server.Infrastructure/DomainEvent/MediatRDomainEventDispatcher.cs
+index a3d4609..2e1f2c1 100644
+--- a/src/Bank.Server/Bank.Server.Infrastructure/DomainEvent/MediatRDomainEventDispatcher.cs
++++ b/src/Bank.Server/Bank.Server.Infrastructure/DomainEvent/MediatRDomainEventDispatcher.cs
+@@ -1,8 +1,7 @@
+ ﻿using Bank.Server.Application.Abstractions.Messaging;
+-using BuildingBlocks.Domain;
++using BuildingBlocks.Domain.Events;
+ using MediatR;
+ 
+-
+ namespace Bank.Server.Infrastructure.DomainEvent
+ {
+     public sealed class MediatRDomainEventDispatcher
+@@ -17,15 +16,9 @@ namespace Bank.Server.Infrastructure.DomainEvent
+         }
+ 
+         public async Task DispatchAsync(
+-            //IEnumerable<IDomainEvent> domainEvents,
++            IReadOnlyCollection<IDomainEvent> domainEvents,
+             CancellationToken cancellationToken)
+         {
+-            //foreach (var domainEvent in domainEvents)
+-            //{
+-            //    await _mediator.Publish(
+-            //        domainEvent,
+-            //        cancellationToken);
+-            //}
+         }
+     }
+ }
+diff --git a/src/Bank.Server/Bank.Server.Infrastructure/Messaging/DomainEventDispatcher.cs b/src/Bank.Server/Bank.Server.Infrastructure/Messaging/DomainEventDispatcher.cs
+index 7b4b0f0..8fcd2c5 100644
+--- a/src/Bank.Server/Bank.Server.Infrastructure/Messaging/DomainEventDispatcher.cs
++++ b/src/Bank.Server/Bank.Server.Infrastructure/Messaging/DomainEventDispatcher.cs
+@@ -1,5 +1,6 @@
+ ﻿using Bank.Server.Application.Abstractions.Messaging;
+ using Bank.Server.Infrastructure.Persistence;
++using BuildingBlocks.Domain.Events;
+ using MediatR;
+ 
+ namespace Bank.Server.Infrastructure.Messaging
+@@ -18,16 +19,10 @@ namespace Bank.Server.Infrastructure.Messaging
+             //_publisher = publisher;
+         }
+ 
+-        public async Task DispatchAsync(CancellationToken ct)
++        public async Task DispatchAsync(
++            IReadOnlyCollection<IDomainEvent> domainEvents,
++            CancellationToken cancellationToken = default)
+         {
+-            //var events = _accessor.GetAllDomainEvents();
+-
+-            //_accessor.ClearAllDomainEvents();
+-
+-            //foreach (var domainEvent in events)
+-            //{
+-            //    await _publisher.Publish(domainEvent, ct);
+-            //}
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/src/BuildingBlocks/BuildingBlocks.Infrastructure/Messaging/DomainEventDispatcher.cs b/src/BuildingBlocks/BuildingBlocks.Infrastructure/Messaging/DomainEventDispatcher.cs
+index 2d0fb23..6a758a4 100644
+--- a/src/BuildingBlocks/BuildingBlocks.Infrastructure/Messaging/DomainEventDispatcher.cs
++++ b/src/BuildingBlocks/BuildingBlocks.Infrastructure/Messaging/DomainEventDispatcher.cs
+@@ -28,22 +28,15 @@ namespace BuildingBlocks.Infrastructure.Messaging
+             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+         }
+ 
+-        public async Task DispatchAsync(CancellationToken cancellationToken = default)
++        public async Task DispatchAsync(
++            IReadOnlyCollection<IDomainEvent> domainEvents,
++            CancellationToken cancellationToken = default)
+         {
+-            while (true)
++            foreach (var domainEvent in domainEvents)
+             {
+-                var domainEvents = _accessor.ExtractDomainEvents();
+-                if (domainEvents == null || !domainEvents.Any())
+-                {
+-                    break;
+-                }
++                EnqueueOutboxMessage(domainEvent);
+ 
+-                foreach (var domainEvent in domainEvents)
+-                {
+-                    EnqueueOutboxMessage(domainEvent);
+-
+-                    await _mediator.Publish(domainEvent, cancellationToken);
+-                }
++                await _mediator.Publish(domainEvent, cancellationToken);
+             }
+         }
+ 
+diff --git a/src/BuildingBlocks/BuildingBlocks.Infrastructure/Persistence/UnitOfWork.cs b/src/BuildingBlocks/BuildingBlocks.Infrastructure/Persistence/UnitOfWork.cs
+index e4b6a67..662b848 100644
+--- a/src/BuildingBlocks/BuildingBlocks.Infrastructure/Persistence/UnitOfWork.cs
++++ b/src/BuildingBlocks/BuildingBlocks.Infrastructure/Persistence/UnitOfWork.cs
+@@ -1,40 +1,52 @@
+-using BuildingBlocks.Application;
+ using BuildingBlocks.Application.Abstractions.Messaging;
++using BuildingBlocks.Application.Abstractions.Persistence;
++using BuildingBlocks.Domain.Common;
++using BuildingBlocks.Domain.Events;
+ using Microsoft.EntityFrameworkCore;
+-using System;
+-using System.Threading;
+-using System.Threading.Tasks;
++using Result = BuildingBlocks.Application.Results.Result;
+ 
+-namespace BuildingBlocks.Infrastructure.Persistence
++namespace BuildingBlocks.Infrastructure.Persistence;
++
++public sealed class UnitOfWork : IUnitOfWork
+ {
+-    public sealed class UnitOfWork : IUnitOfWork
++    private readonly DbContext _dbContext;
++    private readonly IDomainEventDispatcher _domainEventDispatcher;
++
++    public UnitOfWork(
++        DbContext dbContext,
++        IDomainEventDispatcher domainEventDispatcher)
++    {
++        _dbContext = dbContext;
++        _domainEventDispatcher = domainEventDispatcher;
++    }
++
++    public async Task<Result> SaveChangesAsync(CancellationToken cancellationToken = default)
+     {
+-        private readonly DbContext _dbContext;
+-        private readonly IDomainEventDispatcher _domainEventDispatcher;
++        var domainEvents = _dbContext.ChangeTracker
++            .Entries<IAggregateRoot>()
++            .SelectMany(e => e.Entity.DomainEvents)
++            .ToList();
+ 
+-        public UnitOfWork(
+-            DbContext dbContext,
+-            IDomainEventDispatcher domainEventDispatcher)
++        if (domainEvents.Count > 0)
+         {
+-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+-            _domainEventDispatcher = domainEventDispatcher ?? throw new ArgumentNullException(nameof(domainEventDispatcher));
++            foreach (var entry in _dbContext.ChangeTracker.Entries<IAggregateRoot>())
++            {
++                entry.Entity.ClearDomainEvents();
++            }
+         }
+ 
+-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+-        {
+-            // Step 1: Save initial aggregate changes
+-            var result = await _dbContext.SaveChangesAsync(cancellationToken);
++        await _dbContext.SaveChangesAsync(cancellationToken);
+ 
+-            // Step 2: Dispatch domain events (and execute handlers recursively if needed)
+-            await _domainEventDispatcher.DispatchAsync(cancellationToken);
++        if (domainEvents.Count > 0)
++        {
++            await _domainEventDispatcher.DispatchAsync(domainEvents, cancellationToken);
+ 
+-            // Step 3: Save any secondary changes generated by event handlers (e.g. Audit Logs)
+             if (_dbContext.ChangeTracker.HasChanges())
+             {
+-                result += await _dbContext.SaveChangesAsync(cancellationToken);
++                await _dbContext.SaveChangesAsync(cancellationToken);
+             }
+-
+-            return result;
+         }
++
++        return Result.Success();
+     }
+ }

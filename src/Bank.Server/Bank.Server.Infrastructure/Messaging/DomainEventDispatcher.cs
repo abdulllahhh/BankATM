@@ -1,5 +1,6 @@
 ﻿using Bank.Server.Application.Abstractions.Messaging;
 using Bank.Server.Infrastructure.Persistence;
+using BuildingBlocks.Domain.Events;
 using MediatR;
 
 namespace Bank.Server.Infrastructure.Messaging
@@ -18,16 +19,10 @@ namespace Bank.Server.Infrastructure.Messaging
             //_publisher = publisher;
         }
 
-        public async Task DispatchAsync(CancellationToken ct)
+        public async Task DispatchAsync(
+            IReadOnlyCollection<IDomainEvent> domainEvents,
+            CancellationToken cancellationToken = default)
         {
-            //var events = _accessor.GetAllDomainEvents();
-
-            //_accessor.ClearAllDomainEvents();
-
-            //foreach (var domainEvent in events)
-            //{
-            //    await _publisher.Publish(domainEvent, ct);
-            //}
         }
     }
 }

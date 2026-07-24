@@ -28,22 +28,15 @@ namespace BuildingBlocks.Infrastructure.Messaging
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task DispatchAsync(CancellationToken cancellationToken = default)
+        public async Task DispatchAsync(
+            IReadOnlyCollection<IDomainEvent> domainEvents,
+            CancellationToken cancellationToken = default)
         {
-            while (true)
+            foreach (var domainEvent in domainEvents)
             {
-                var domainEvents = _accessor.ExtractDomainEvents();
-                if (domainEvents == null || !domainEvents.Any())
-                {
-                    break;
-                }
+                EnqueueOutboxMessage(domainEvent);
 
-                foreach (var domainEvent in domainEvents)
-                {
-                    EnqueueOutboxMessage(domainEvent);
-
-                    await _mediator.Publish(domainEvent, cancellationToken);
-                }
+                await _mediator.Publish(domainEvent, cancellationToken);
             }
         }
 
