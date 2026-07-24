@@ -1,4 +1,4 @@
-using Banking.Domain.Aggregates;
+using Banking.Application.Abstractions.Persistence;
 using Banking.Infrastructure.Persistence;
 using Banking.Infrastructure.Persistence.Repositories;
 using BuildingBlocks.Application.Abstractions.Persistence;
@@ -29,9 +29,9 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddScoped<IRepository<Account, Guid>, AccountRepository>();
-        services.AddScoped<IRepository<DebitCard, Guid>, DebitCardRepository>();
-        services.AddScoped<IRepository<ATM, Guid>, ATMRepository>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IDebitCardRepository, DebitCardRepository>();
+        services.AddScoped<IATMRepository, ATMRepository>();
 
         return services;
     }

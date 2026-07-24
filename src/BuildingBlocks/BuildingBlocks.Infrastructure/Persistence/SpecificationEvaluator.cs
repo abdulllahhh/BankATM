@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildingBlocks.Infrastructure.Persistence;
 
-internal static class SpecificationEvaluator
+public static class SpecificationEvaluator
 {
     public static IQueryable<T> GetQuery<T>(
         IQueryable<T> inputQuery,
