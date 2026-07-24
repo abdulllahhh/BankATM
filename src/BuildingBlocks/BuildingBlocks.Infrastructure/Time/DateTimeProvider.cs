@@ -3,9 +3,24 @@ using BuildingBlocks.Application.Abstractions.Time;
 namespace BuildingBlocks.Infrastructure.Time;
 
 /// <summary>
-/// Provides the current UTC time by delegating to DateTime.UtcNow.
+/// Provides the current UTC date and time by delegating to
+/// <see cref="TimeProvider.System"/>. This abstraction enables
+/// deterministic time in tests by replacing <see cref="TimeProvider"/>
+/// at the composition root.
 /// </summary>
 public sealed class DateTimeProvider : IDateTimeProvider
 {
-    public DateTime UtcNow => DateTime.UtcNow;
+    private readonly TimeProvider _timeProvider;
+
+    public DateTimeProvider()
+        : this(TimeProvider.System)
+    {
+    }
+
+    public DateTimeProvider(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
+    public DateTime UtcNow => _timeProvider.GetUtcNow().UtcDateTime;
 }
