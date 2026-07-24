@@ -1,16 +1,17 @@
-﻿using Bank.Server.Application.Abstractions.Messaging;
 using Bank.Server.Application.Abstractions.Persistence;
-using Bank.Server.Application.Common.Interfaces;
-using Bank.Server.Infrastructure.DomainEvent;
-using Bank.Server.Infrastructure.Messaging;
+using Bank.Server.Domain.AuditContext.Repositories;
 using Bank.Server.Infrastructure.Persistence;
-using Bank.Server.Infrastructure.Persistence.Interceptors;
 using Bank.Server.Infrastructure.Persistence.Repositories;
+using BuildingBlocks.Application;
+using BuildingBlocks.Application.Abstractions.Messaging;
+using BuildingBlocks.Infrastructure.Events;
+using BuildingBlocks.Infrastructure.Messaging;
+using BuildingBlocks.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Bank.Server.Infrastructure;
+namespace Bank.Server.Infrastructure.DependencyInjection;
 
 public static class DependencyInjection
 {
@@ -18,27 +19,22 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<PublishDomainEventsInterceptor>();
         services.AddDbContext<BankDbContext>(
-            (sp, options) =>
-        {
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            (_, options) =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            });
 
-            options.AddInterceptors(
-                sp.GetRequiredService<
-                    PublishDomainEventsInterceptor>());
-        });
-        services.AddScoped<DomainEventInterceptor>();
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<BankDbContext>());
+        services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-        services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IAccountRepository, AccountRepository>();
-
         services.AddScoped<ICardRepository, CardRepository>();
-
         services.AddScoped<ITransactionRepository, TransactionRepository>();
-
         services.AddScoped<IATMRepository, ATMRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
         return services;
     }

@@ -1,9 +1,10 @@
 ﻿
 using Bank.Server.Domain.AccountContext.Aggregates;
 using Bank.Server.Domain.ATMContext.Aggregates;
-using Bank.Server.Domain.AuditLog;
+using Bank.Server.Domain.AuditContext.Aggregates;
 using Bank.Server.Domain.CardContext.Aggregates;
 using Bank.Server.Domain.TransactionContext.Aggregates;
+using BuildingBlocks.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Server.Infrastructure.Persistence;
@@ -18,6 +19,7 @@ public class BankDbContext : DbContext
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<ATM> ATMs => Set<ATM>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public override async Task<int> SaveChangesAsync(
     CancellationToken cancellationToken)
     {

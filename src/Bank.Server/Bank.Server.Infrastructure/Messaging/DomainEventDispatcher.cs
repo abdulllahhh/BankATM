@@ -1,26 +1,33 @@
 ﻿using Bank.Server.Application.Abstractions.Messaging;
-using Bank.Server.Domain.Common;
+using Bank.Server.Infrastructure.Persistence;
 using MediatR;
 
-namespace Bank.Server.Infrastructure.Messaging;
-
-public sealed class DomainEventDispatcher
-    : IDomainEventDispatcher
+namespace Bank.Server.Infrastructure.Messaging
 {
-    private readonly IMediator _mediator;
-
-    public DomainEventDispatcher(IMediator mediator)
+    public sealed class DomainEventDispatcher : IDomainEventDispatcher
     {
-        _mediator = mediator;
-    }
+        //private readonly DomainEventsAccessor _accessor;
+        //private readonly IPublisher _publisher;
 
-    public async Task DispatchAsync(
-        IEnumerable<IDomainEvent> domainEvents,
-        CancellationToken cancellationToken)
-    {
-        foreach (var domainEvent in domainEvents)
+        public DomainEventDispatcher(
+            //DomainEventsAccessor accessor,
+            //IPublisher publisher
+            )
         {
-            await _mediator.Publish(domainEvent, cancellationToken);
+            //_accessor = accessor;
+            //_publisher = publisher;
+        }
+
+        public async Task DispatchAsync(CancellationToken ct)
+        {
+            //var events = _accessor.GetAllDomainEvents();
+
+            //_accessor.ClearAllDomainEvents();
+
+            //foreach (var domainEvent in events)
+            //{
+            //    await _publisher.Publish(domainEvent, ct);
+            //}
         }
     }
 }

@@ -23,10 +23,4 @@ public sealed class ATMRepository
                 x => x.Id == id,
                 cancellationToken);
     }
-
-    public async Task SaveChangesAsync(
-        CancellationToken cancellationToken)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

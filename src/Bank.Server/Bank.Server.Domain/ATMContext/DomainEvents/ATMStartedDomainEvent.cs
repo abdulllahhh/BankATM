@@ -1,10 +1,9 @@
-﻿using System;
+using BuildingBlocks.SharedKernel.DomainEvents;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Bank.Server.Domain.ATMContext.DomainEvents
 {
-    public class ATMStartedDomainEvent
-    {
-    }
+    public sealed record ATMStartedDomainEvent() : DomainEvent;
 }

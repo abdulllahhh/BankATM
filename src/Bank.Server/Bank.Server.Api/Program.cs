@@ -1,6 +1,6 @@
 using Bank.Server.Application;
 using Bank.Server.Application.Handlers;
-using Bank.Server.Infrastructure;
+using Bank.Server.Infrastructure.DependencyInjection;
 using Bank.Server.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,4 +43,5 @@ app.MapHealthChecks("/health")
    });
 
 app.MapControllers();
+
 app.Run();

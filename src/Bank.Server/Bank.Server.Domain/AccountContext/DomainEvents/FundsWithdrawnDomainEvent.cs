@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.SharedKernel.DomainEvents;
+using BuildingBlocks.SharedKernel.DomainEvents;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,9 @@ namespace Bank.Server.Domain.AccountContext.DomainEvents
 {
     public sealed record FundsWithdrawnDomainEvent(
         Guid AccountId,
-        decimal Amount)
+        Guid AtmId,
+        decimal Amount,
+        string Currency,
+        Guid TransactionId)
         : DomainEvent, INotification;
 }

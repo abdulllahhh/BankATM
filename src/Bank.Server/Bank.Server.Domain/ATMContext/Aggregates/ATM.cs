@@ -1,8 +1,7 @@
 ﻿using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Domain.ATMContext.DomainEvents;
 using Bank.Server.Domain.ATMContext.ValueObjects;
-using Bank.Server.Domain.BaseValueObject;
-
+using BuildingBlocks.Domain.Common;
 
 namespace Bank.Server.Domain.ATMContext.Aggregates
 {
@@ -36,6 +35,9 @@ namespace Bank.Server.Domain.ATMContext.Aggregates
 
             return Result.Success();
         }
+
+        public Result DecreaseCashInventory(Money amount)
+            => DispenseCash(amount);
 
         public void LoadCash(Money amount)
         {

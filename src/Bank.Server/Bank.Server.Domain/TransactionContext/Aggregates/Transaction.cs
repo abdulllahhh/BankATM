@@ -1,6 +1,7 @@
-﻿using Bank.Server.Domain.AccountContext.ValueObjects;
+using Bank.Server.Domain.AccountContext.ValueObjects;
 using Bank.Server.Domain.TransactionContext.DomainEvents;
 using Bank.Server.Domain.TransactionContext.ValueObjects;
+using BuildingBlocks.Domain.Common;
 
 
 namespace Bank.Server.Domain.TransactionContext.Aggregates
@@ -8,6 +9,10 @@ namespace Bank.Server.Domain.TransactionContext.Aggregates
     public sealed class Transaction
         : AggregateRoot<Guid>
     {
+        private Transaction()
+        {
+        }
+
         public TransactionStatus Status { get; private set; }
 
         public TransactionType Type { get; private set; }
@@ -17,6 +22,27 @@ namespace Bank.Server.Domain.TransactionContext.Aggregates
         public Guid? FromAccountId { get; private set; }
 
         public Guid? ToAccountId { get; private set; }
+
+        public static Transaction CreateWithdrawal(
+            Guid transactionId,
+            Guid accountId,
+            Money amount)
+        {
+            if (transactionId == Guid.Empty)
+                throw new ArgumentException("Transaction id must not be empty.", nameof(transactionId));
+
+            if (accountId == Guid.Empty)
+                throw new ArgumentException("Account id must not be empty.", nameof(accountId));
+
+            return new Transaction
+            {
+                Id = transactionId,
+                Type = TransactionType.Withdraw,
+                Status = TransactionStatus.Completed,
+                Amount = amount,
+                FromAccountId = accountId
+            };
+        }
 
         public void Approve()
         {

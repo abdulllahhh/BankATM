@@ -1,9 +1,4 @@
-﻿using Bank.Server.Domain.BaseValueObject;
-using Bank.Server.Domain.CardContext.ValueObjects;
-using BuildingBlocks.SharedKernel.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BuildingBlocks.Domain.Common;
 
 namespace Bank.Server.Domain.ATMContext.ValueObjects
 {
