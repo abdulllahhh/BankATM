@@ -1,11 +1,16 @@
 using BuildingBlocks.Domain.Events;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace BuildingBlocks.Application.Abstractions.Messaging
+namespace BuildingBlocks.Application.Abstractions.Messaging;
+
+/// <summary>
+/// Dispatches domain events collected from aggregate roots to their registered handlers.
+/// </summary>
+public interface IDomainEventDispatcher
 {
-    public interface IDomainEventDispatcher
-    {
-        Task DispatchAsync(CancellationToken cancellationToken = default);
-    }
+    /// <summary>
+    /// Dispatches the provided domain events.
+    /// </summary>
+    Task DispatchAsync(
+        IReadOnlyCollection<IDomainEvent> domainEvents,
+        CancellationToken cancellationToken = default);
 }
