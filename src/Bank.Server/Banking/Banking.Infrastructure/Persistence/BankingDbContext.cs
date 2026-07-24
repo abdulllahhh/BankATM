@@ -16,9 +16,4 @@ public class BankingDbContext : BaseDbContext
         : base(options)
     {
     }
-
-    protected override void ConfigureModel(ModelBuilder modelBuilder)
-    {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BankingDbContext).Assembly);
-    }
 }

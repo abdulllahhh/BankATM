@@ -3,14 +3,25 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildingBlocks.Infrastructure.Persistence;
 
 /// <summary>
-/// Base DbContext for all bounded contexts. Provides shared SaveChangesAsync
-/// extensibility and a <see cref="ConfigureModel"/> hook that derived contexts
-/// override instead of <see cref="OnModelCreating"/>.
+/// Base DbContext for all bounded contexts in the system.
 ///
-/// Responsibilities are intentionally limited:
-/// - Delegates to base SaveChangesAsync (no domain event dispatch, no auditing).
-/// - Keeps the class infrastructure-agnostic (no references to MediatR, outbox, etc.).
-/// - Derived contexts add their own DbSets, configurations, and interceptors.
+/// Automatically discovers and applies <see cref="IEntityTypeConfiguration{TEntity}"/>
+/// classes from the assembly of the derived context via
+/// <see cref="ModelBuilder.ApplyConfigurationsFromAssembly"/>,
+/// so each module only needs to define its own configurations and DbSets.
+///
+/// Responsibilities are intentionally minimal:
+/// - Accepts <see cref="DbContextOptions"/> and passes them to the base class.
+/// - Overrides <see cref="SaveChangesAsync(CancellationToken)"/> as a thin
+///   pass-through to the base implementation.
+/// - Overrides <see cref="OnModelCreating(ModelBuilder)"/> (as sealed) to
+///   automatically scan the derived assembly for entity configurations.
+///
+/// Derived contexts MUST NOT override <see cref="OnModelCreating"/>.
+/// All entity configuration must be done via
+/// <see cref="IEntityTypeConfiguration{TEntity}"/> classes.
+/// Cross-cutting concerns (auditing, domain events, soft deletes, etc.) are
+/// handled by registered EF Core interceptors, not by this class.
 /// </summary>
 public abstract class BaseDbContext : DbContext
 {
@@ -19,37 +30,16 @@ public abstract class BaseDbContext : DbContext
     {
     }
 
-    /// <summary>
-    /// Saves changes to the database. Override this in derived classes to add
-    /// pre-save or post-save behavior (e.g., interceptors, audit stamps).
-    /// </summary>
     public override async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
-        // Reserved for future pre-save hooks (interceptors, audit, etc.).
-        // Domain events are NOT dispatched here — they are handled by the
-        // UnitOfWork or a dedicated pipeline behavior.
-
-        var result = await base.SaveChangesAsync(cancellationToken);
-
-        // Reserved for future post-save hooks.
-
-        return result;
-    }
-
-    /// <summary>
-    /// Configures the model after base initialization.
-    /// Derived classes override this to apply entity configurations,
-    /// rather than overriding <see cref="OnModelCreating"/> directly.
-    /// </summary>
-    protected virtual void ConfigureModel(ModelBuilder modelBuilder)
-    {
+        return await base.SaveChangesAsync(cancellationToken);
     }
 
     protected override sealed void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        ConfigureModel(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 }
