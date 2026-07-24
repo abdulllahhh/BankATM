@@ -1,79 +1,71 @@
-using BuildingBlocks.Domain.Common;
+using System.Reflection;
+using BuildingBlocks.Application.Abstractions.Persistence;
+using BuildingBlocks.Application.CQRS;
+using BuildingBlocks.Application.Results;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace BuildingBlocks.Application.Behaviors
+namespace BuildingBlocks.Application.Behaviors;
+
+public sealed class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 {
-    public sealed class TransactionBehavior<TRequest, TResponse>
-        : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    private readonly IUnitOfWork _unitOfWork;
+
+    public TransactionBehavior(IUnitOfWork unitOfWork)
     {
-        private readonly DbContext _dbContext;
-        private readonly ILogger<TransactionBehavior<TRequest, TResponse>> _logger;
+        _unitOfWork = unitOfWork;
+    }
 
-        public TransactionBehavior(
-            DbContext dbContext,
-            ILogger<TransactionBehavior<TRequest, TResponse>> _logger)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
+    {
+        if (!IsCommand())
+            return await next();
+
+        var response = await next();
+
+        if (IsSuccess(response))
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            this._logger = _logger ?? throw new ArgumentNullException(nameof(_logger));
+            var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (saveResult.IsFailure)
+                return CreateFailureResult(saveResult.Error);
         }
 
-        public async Task<TResponse> Handle(
-            TRequest request,
-            RequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken)
-        {
-            // Only apply to commands (transactional requests)
-            if (!IsCommandRequest())
-            {
-                return await next();
-            }
+        return response;
+    }
 
-            // Step 1: Check if there is already an active transaction
-            if (_dbContext.Database.CurrentTransaction != null)
-            {
-                return await next();
-            }
+    private static bool IsCommand()
+    {
+        var type = typeof(TRequest);
+        return type.Name.EndsWith("Command") ||
+               type.GetInterfaces().Any(i =>
+                   i == typeof(ICommand) ||
+                   (i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>)));
+    }
 
-            // Step 2: Open a new execution strategy transaction (to support retries if configured)
-            var strategy = _dbContext.Database.CreateExecutionStrategy();
-            return await strategy.ExecuteAsync(async () =>
-            {
-                // Step 3: Begin the transaction
-                using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-                try
-                {
-                    // Step 4: Await the command handler execution (which calls UnitOfWork.SaveChangesAsync)
-                    var response = await next();
+    private static bool IsSuccess(TResponse response)
+    {
+        if (response is Result result)
+            return result.IsSuccess;
 
-                    // Step 5: Commit the transaction after successful execution
-                    await transaction.CommitAsync(cancellationToken);
+        var prop = typeof(TResponse).GetProperty("IsSuccess");
+        return prop is null || (bool)prop.GetValue(response)!;
+    }
 
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    // Step 6: Log, rollback, and rethrow the exception
-                    _logger.LogError(ex, "Transaction failed for request {RequestName}. Transaction rolled back.", typeof(TRequest).Name);
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw;
-                }
-            });
-        }
+    private static TResponse CreateFailureResult(Error error)
+    {
+        if (typeof(TResponse) == typeof(Result))
+            return (TResponse)(object)Result.Failure(error);
 
-        private static bool IsCommandRequest()
-        {
-            var requestType = typeof(TRequest);
-            return requestType.Name.EndsWith("Command") ||
-                   requestType.GetInterfaces().Any(i =>
-                       i == typeof(ICommand) ||
-                       (i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>)));
-        }
+        var valueType = typeof(TResponse).GetGenericArguments()[0];
+        var method = typeof(Result)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .First(m => m.Name == "Failure" && m.IsGenericMethodDefinition);
+
+        return (TResponse)(object)method
+            .MakeGenericMethod(valueType)
+            .Invoke(null, [error])!;
     }
 }
