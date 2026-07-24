@@ -1,5 +1,5 @@
+using BuildingBlocks.Application.Specifications;
 using BuildingBlocks.Domain.Common;
-using BuildingBlocks.Domain.Specifications;
 
 namespace BuildingBlocks.Application.Abstractions.Persistence;
 
