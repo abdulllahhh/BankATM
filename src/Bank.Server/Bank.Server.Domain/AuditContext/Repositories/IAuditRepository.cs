@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Bank.Server.Domain.AuditContext.Repositories
 {
-    internal interface IAuditRepository
+    public interface IAuditRepository
     {
     }
 }

@@ -8,7 +8,6 @@
   <Folder Name="/scripts/" />
   <Folder Name="/src/">
     <Project Path="src/ATM.Client/ATM.Client.csproj" />
-    <Project Path="src/BuildingBlocks.SharedKernel/BuildingBlocks.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Bank.Server/">
     <Project Path="src/Bank.Server/Bank.Server.Api/Bank.Server.Api.csproj" />

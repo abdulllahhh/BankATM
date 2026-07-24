@@ -4,7 +4,6 @@
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\Bank.Server.Domain\Bank.Server.Domain.csproj" />
-    <ProjectReference Include="..\..\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
