@@ -14,6 +14,9 @@
     <Project Path="src/Bank.Server/Bank.Server.Application/Bank.Server.Application.csproj" />
     <Project Path="src/Bank.Server/Bank.Server.Domain/Bank.Server.Domain.csproj" />
     <Project Path="src/Bank.Server/Bank.Server.Infrastructure/Bank.Server.Infrastructure.csproj" />
+    <Project Path="src/Bank.Server/Banking/Banking.Application/Banking.Application.csproj" />
+    <Project Path="src/Bank.Server/Banking/Banking.Domain/Banking.Domain.csproj" />
+    <Project Path="src/Bank.Server/Banking/Banking.Infrastructure/Banking.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" />
