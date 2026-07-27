@@ -1,5 +1,6 @@
 using Banking.Application.Abstractions.Persistence;
-using Banking.Domain.Aggregates;
+using Banking.Domain.Cards.Aggregate;
+using Banking.Domain.Cards.ValueObjects;
 using BuildingBlocks.Application.Specifications;
 using BuildingBlocks.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,14 @@ public sealed class DebitCardRepository : IDebitCardRepository
     {
         return await _context.DebitCards
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+    }
+
+    public async Task<DebitCard?> GetByCardNumberAsync(
+        CardNumber cardNumber,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.DebitCards
+            .FirstOrDefaultAsync(d => d.CardNumber == cardNumber, cancellationToken);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)

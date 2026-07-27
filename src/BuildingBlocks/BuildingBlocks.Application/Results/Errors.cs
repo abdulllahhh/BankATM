@@ -15,7 +15,13 @@ public static class Errors
 
     public static class Card
     {
+        public static Error NotFound => new("CARD.NOT_FOUND", "Card not found.");
         public static Error InvalidPin => new("CARD.INVALID_PIN", "Invalid PIN.");
+        public static Error CardNotActive => new("CARD.NOT_ACTIVE", "Card is not active.");
+        public static Error CardBlocked => new("CARD.BLOCKED", "Card has been blocked.");
+        public static Error CardConfiscated => new("CARD.CONFISCATED", "Card has been confiscated.");
+        public static Error CardExpired => new("CARD.EXPIRED", "Card has expired.");
+        public static Error MaxFailedAttempts => new("CARD.MAX_FAILED_ATTEMPTS", "Maximum failed PIN attempts reached.");
     }
 
     public static class ATM
