@@ -8,170 +8,138 @@ namespace Banking.Domain.Cards.Aggregate;
 
 public sealed class DebitCard : AggregateRoot<Guid>
 {
-    private const int MaxFailedPinAttempts = 3;
+    public const int MaxFailedPinAttempts = 3;
 
-    public Guid AccountId { get; private set; }
     public CardNumber CardNumber { get; private set; } = null!;
     public Pin Pin { get; private set; } = null!;
-    public ExpirationDate ExpirationDate { get; private set; } = null!;
     public IssueDate IssueDate { get; private set; } = null!;
+    public ExpirationDate ExpirationDate { get; private set; } = null!;
     public CardStatus Status { get; private set; }
-    public int FailedAttempts { get; private set; }
+    public int FailedPinAttempts { get; private set; }
 
-    private DebitCard() { }
-
-    private DebitCard(
-        Guid id,
-        Guid accountId,
-        CardNumber cardNumber,
-        Pin pin,
-        ExpirationDate expirationDate,
-        IssueDate issueDate)
-        : base(id)
+    private DebitCard()
     {
-        AccountId = accountId;
-        CardNumber = cardNumber;
-        Pin = pin;
-        ExpirationDate = expirationDate;
-        IssueDate = issueDate;
-        Status = CardStatus.Active;
     }
 
     public static DebitCard Issue(
-        Guid id,
-        Guid accountId,
         CardNumber cardNumber,
         Pin pin,
+        IssueDate issueDate,
         ExpirationDate expirationDate)
     {
-        return new DebitCard(id, accountId, cardNumber, pin, expirationDate, IssueDate.Now());
-    }
-
-    public void Validate()
-    {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.Validate.CardNotActive));
-        Guard.CheckRule(new CardMustNotBeExpiredRule(ExpirationDate, CardErrors.Validate.CardExpired));
-
-        RaiseDomainEvent(new CardValidatedDomainEvent(CardNumber, DateTime.UtcNow));
-    }
-
-    public void AuthenticatePin(Pin pin)
-    {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.AuthenticatePin.CardNotActive));
-
-        if (Pin.Equals(pin))
+        var card = new DebitCard
         {
-            FailedAttempts = 0;
-            RaiseDomainEvent(new PinAuthenticatedDomainEvent(CardNumber, DateTime.UtcNow));
+            Id = Guid.NewGuid(),
+            CardNumber = cardNumber,
+            Pin = pin,
+            IssueDate = issueDate,
+            ExpirationDate = expirationDate,
+            Status = CardStatus.Active,
+            FailedPinAttempts = 0
+        };
+
+        return card;
+    }
+
+    public Result Validate()
+    {
+        if (ExpirationDate.IsExpired())
+        {
+            Status = CardStatus.Expired;
+            return Result.Failure(CardErrors.CardExpired);
         }
-        else
-        {
-            FailedAttempts++;
-            RaiseDomainEvent(new PinAuthenticationFailedDomainEvent(CardNumber, FailedAttempts, DateTime.UtcNow));
 
-            if (FailedAttempts >= MaxFailedPinAttempts)
+        if (Status != CardStatus.Active)
+        {
+            return Result.Failure(CardErrors.CardNotActive);
+        }
+
+        RaiseDomainEvent(new CardValidatedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result AuthenticatePin(Pin pin)
+    {
+        if (ExpirationDate.IsExpired())
+        {
+            Status = CardStatus.Expired;
+            return Result.Failure(CardErrors.CardExpired);
+        }
+
+        if (Status == CardStatus.Blocked)
+        {
+            return Result.Failure(CardErrors.CardBlocked);
+        }
+
+        if (Status == CardStatus.Confiscated)
+        {
+            return Result.Failure(CardErrors.CardConfiscated);
+        }
+
+        if (Status != CardStatus.Active)
+        {
+            return Result.Failure(CardErrors.CardNotActive);
+        }
+
+        if (!Pin.Matches(pin.Hash))
+        {
+            FailedPinAttempts++;
+
+            RaiseDomainEvent(new PinAuthenticationFailedDomainEvent(Id, FailedPinAttempts));
+
+            if (FailedPinAttempts >= MaxFailedPinAttempts)
             {
                 Status = CardStatus.Confiscated;
-                RaiseDomainEvent(new CardConfiscatedDomainEvent(
-                    CardNumber,
-                    CardErrors.AuthenticatePin.CardNowConfiscated,
-                    DateTime.UtcNow));
+                RaiseDomainEvent(new CardConfiscatedDomainEvent(Id));
+                return Result.Failure(CardErrors.MaxFailedAttemptsReached);
             }
+
+            return Result.Failure(CardErrors.InvalidPin);
         }
+
+        FailedPinAttempts = 0;
+
+        RaiseDomainEvent(new PinAuthenticatedDomainEvent(Id));
+
+        return Result.Success();
     }
 
-    public void IncrementFailedAttempts()
+    public Result Block(string reason)
     {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.IncrementFailedAttempts.CardNotActive));
-
-        FailedAttempts++;
-
-        if (FailedAttempts >= MaxFailedPinAttempts)
+        if (Status == CardStatus.Blocked)
         {
-            Status = CardStatus.Confiscated;
-            RaiseDomainEvent(new CardConfiscatedDomainEvent(
-                CardNumber,
-                CardErrors.IncrementFailedAttempts.MaxAttemptsReached,
-                DateTime.UtcNow));
+            return Result.Failure(CardErrors.AlreadyBlocked);
         }
-    }
 
-    public void ResetFailedAttempts()
-    {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.ResetFailedAttempts.CardNotActive));
-
-        FailedAttempts = 0;
-    }
-
-    public void Confiscate(string reason)
-    {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.Confiscate.CardNotActive));
-
-        Status = CardStatus.Confiscated;
-        RaiseDomainEvent(new CardConfiscatedDomainEvent(CardNumber, reason, DateTime.UtcNow));
-    }
-
-    public void Block(string reason)
-    {
-        Guard.CheckRule(new CardMustBeActiveRule(Status, CardErrors.Block.CardNotActive));
+        if (Status == CardStatus.Confiscated)
+        {
+            return Result.Failure(CardErrors.AlreadyConfiscated);
+        }
 
         Status = CardStatus.Blocked;
-        RaiseDomainEvent(new CardBlockedDomainEvent(CardNumber, reason, DateTime.UtcNow));
+
+        RaiseDomainEvent(new CardBlockedDomainEvent(Id, reason));
+
+        return Result.Success();
     }
 
-    public void Expire()
+    public Result Confiscate()
     {
-        Guard.CheckRule(new CardMustNotBeTerminalRule(Status, CardErrors.Expire.AlreadyTerminal));
-
-        Status = CardStatus.Expired;
-    }
-
-    private sealed class CardMustBeActiveRule : IBusinessRule
-    {
-        private readonly CardStatus _status;
-        private readonly string _message;
-
-        public CardMustBeActiveRule(CardStatus status, string message)
+        if (Status == CardStatus.Confiscated)
         {
-            _status = status;
-            _message = message;
+            return Result.Failure(CardErrors.AlreadyConfiscated);
         }
 
-        public string Message => _message;
-
-        public bool IsBroken() => _status != CardStatus.Active;
-    }
-
-    private sealed class CardMustNotBeExpiredRule : IBusinessRule
-    {
-        private readonly ExpirationDate _expirationDate;
-        private readonly string _message;
-
-        public CardMustNotBeExpiredRule(ExpirationDate expirationDate, string message)
+        if (Status == CardStatus.Blocked)
         {
-            _expirationDate = expirationDate;
-            _message = message;
+            return Result.Failure(CardErrors.CardBlocked);
         }
 
-        public string Message => _message;
+        Status = CardStatus.Confiscated;
 
-        public bool IsBroken() => _expirationDate.IsExpired;
-    }
+        RaiseDomainEvent(new CardConfiscatedDomainEvent(Id));
 
-    private sealed class CardMustNotBeTerminalRule : IBusinessRule
-    {
-        private readonly CardStatus _status;
-        private readonly string _message;
-
-        public CardMustNotBeTerminalRule(CardStatus status, string message)
-        {
-            _status = status;
-            _message = message;
-        }
-
-        public string Message => _message;
-
-        public bool IsBroken() =>
-            _status is CardStatus.Blocked or CardStatus.Expired or CardStatus.Confiscated;
+        return Result.Success();
     }
 }

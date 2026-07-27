@@ -4,27 +4,30 @@ namespace Banking.Domain.Cards.ValueObjects;
 
 public sealed class IssueDate : ValueObject
 {
-    public DateTime Value { get; }
+    public DateOnly Value { get; }
 
-    private IssueDate(DateTime value)
+    private IssueDate(DateOnly value)
     {
         Value = value;
     }
 
-    public static IssueDate From(DateTime value)
+    public static IssueDate Create(DateOnly value)
     {
-        if (value > DateTime.UtcNow)
-            throw new ArgumentException("Issue date cannot be in the future.", nameof(value));
+        if (value > DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            throw new DomainException("Issue date cannot be in the future.");
+        }
 
         return new IssueDate(value);
     }
 
-    public static IssueDate Now() => new(DateTime.UtcNow);
+    public static IssueDate Today()
+    {
+        return new IssueDate(DateOnly.FromDateTime(DateTime.UtcNow));
+    }
 
     protected override IEnumerable<object?> GetEqualityComponents()
     {
         yield return Value;
     }
-
-    public override string ToString() => Value.ToString("yyyy-MM-dd");
 }

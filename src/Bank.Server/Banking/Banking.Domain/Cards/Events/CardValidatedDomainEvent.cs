@@ -3,9 +3,9 @@ using BuildingBlocks.Domain.Events;
 namespace Banking.Domain.Cards.Events;
 
 public sealed record CardValidatedDomainEvent(
-    ValueObjects.CardNumber CardNumber,
-    DateTime ValidatedAt) : IDomainEvent
+    Guid CardId)
+    : IDomainEvent
 {
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;
+    public Guid EventId { get; init; } = Guid.NewGuid();
+    public DateTime OccurredOnUtc { get; init; } = DateTime.UtcNow;
 }

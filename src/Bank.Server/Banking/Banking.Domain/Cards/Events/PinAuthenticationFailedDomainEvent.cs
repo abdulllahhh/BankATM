@@ -3,10 +3,10 @@ using BuildingBlocks.Domain.Events;
 namespace Banking.Domain.Cards.Events;
 
 public sealed record PinAuthenticationFailedDomainEvent(
-    ValueObjects.CardNumber CardNumber,
-    int FailedAttempts,
-    DateTime AttemptedAt) : IDomainEvent
+    Guid CardId,
+    int FailedAttempts)
+    : IDomainEvent
 {
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;
+    public Guid EventId { get; init; } = Guid.NewGuid();
+    public DateTime OccurredOnUtc { get; init; } = DateTime.UtcNow;
 }
