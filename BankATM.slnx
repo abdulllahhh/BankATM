@@ -29,4 +29,6 @@
     <Project Path="src/BuildingBlocks/BuildingBlocks.Security/BuildingBlocks.Security.csproj" />
   </Folder>
   <Folder Name="/Tests/" />
+  <Project Path="tests/Bank.Server/Banking.Application.UnitTests/Banking.Application.UnitTests.csproj" />
+  <Project Path="tests/Bank.Server/Banking.Domain.UnitTests/Banking.Domain.UnitTests.csproj" />
 </Solution>

@@ -82,7 +82,7 @@ public sealed class DebitCard : AggregateRoot<Guid>
             return Result.Failure(CardErrors.CardNotActive);
         }
 
-        if (!Pin.Matches(pin.Hash))
+        if (Pin.Hash != pin.Hash)
         {
             FailedPinAttempts++;
 
