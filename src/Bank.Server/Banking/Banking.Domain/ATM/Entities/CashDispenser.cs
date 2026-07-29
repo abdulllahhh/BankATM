@@ -1,3 +1,4 @@
+using Banking.Domain.ATM.DomainServices;
 using Banking.Domain.ATM.ValueObjects;
 using BuildingBlocks.Domain.Common;
 
@@ -30,87 +31,83 @@ public sealed class CashDispenser : Entity<Guid>
         return Result.Success();
     }
 
-    public bool CanDispense(IReadOnlyDictionary<Denomination, int> denominations)
+    public DispensePlan CreatePlan(decimal amount, ICashDispenseStrategy strategy)
     {
-        if (denominations is null || denominations.Count == 0)
-        {
-            return false;
-        }
+        var cassetteInfos = _cassettes
+            .Select(c => new CassetteInfo(c.Denomination, c.AvailableCount))
+            .ToList();
 
-        if (denominations.Values.Any(q => q <= 0))
-        {
-            return false;
-        }
-
-        foreach (var (denomination, quantity) in denominations)
-        {
-            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(denomination));
-
-            if (cassette is null)
-            {
-                return false;
-            }
-
-            if (!cassette.CanReserve(quantity))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return strategy.CreatePlan(amount, cassetteInfos);
     }
 
-    public Result ReserveCash(IReadOnlyDictionary<Denomination, int> denominations)
+    public Result ReserveCash(DispensePlan plan)
     {
-        if (denominations is null || denominations.Count == 0)
+        if (plan.IsEmpty)
         {
-            return Result.Failure("At least one denomination must be specified.");
+            return Result.Failure("Cannot reserve an empty plan.");
         }
 
-        if (denominations.Values.Any(q => q <= 0))
+        foreach (var item in plan.Items)
         {
-            return Result.Failure("Quantity must be greater than zero.");
-        }
-
-        foreach (var (denomination, quantity) in denominations)
-        {
-            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(denomination));
+            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(item.Denomination));
 
             if (cassette is null)
             {
-                return Result.Failure("The specified denomination was not found in the dispenser.");
+                return Result.Failure("Plan references a denomination not present in the dispenser.");
             }
 
-            if (!cassette.CanReserve(quantity))
+            if (!cassette.CanReserve(item.Quantity))
             {
-                return Result.Failure("Insufficient cash to complete this operation.");
+                return Result.Failure("Insufficient available cash to complete this reservation.");
             }
         }
 
-        foreach (var (denomination, quantity) in denominations)
+        foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(denomination));
-            cassette.Reserve(quantity);
+            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
+            cassette.Reserve(item.Quantity);
         }
 
         return Result.Success();
     }
 
-    public void DispenseCash(IReadOnlyDictionary<Denomination, int> denominations)
+    public Result DispenseCash(DispensePlan plan)
     {
-        foreach (var (denomination, quantity) in denominations)
+        if (plan.IsEmpty)
         {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(denomination));
-            cassette.Dispense(quantity);
+            return Result.Failure("Cannot dispense an empty plan.");
         }
+
+        foreach (var item in plan.Items)
+        {
+            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(item.Denomination));
+
+            if (cassette is null)
+            {
+                return Result.Failure("Plan references a denomination not present in the dispenser.");
+            }
+
+            if (cassette.ReservedCount < item.Quantity)
+            {
+                return Result.Failure("Cannot dispense more than the reserved quantity.");
+            }
+        }
+
+        foreach (var item in plan.Items)
+        {
+            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
+            cassette.Dispense(item.Quantity);
+        }
+
+        return Result.Success();
     }
 
-    public void ReleaseCash(IReadOnlyDictionary<Denomination, int> denominations)
+    public void ReleaseCash(DispensePlan plan)
     {
-        foreach (var (denomination, quantity) in denominations)
+        foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(denomination));
-            cassette.Release(quantity);
+            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
+            cassette.Release(item.Quantity);
         }
     }
 

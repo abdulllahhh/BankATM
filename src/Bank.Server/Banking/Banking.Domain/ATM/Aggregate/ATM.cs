@@ -1,3 +1,4 @@
+using Banking.Domain.ATM.DomainServices;
 using Banking.Domain.ATM.Entities;
 using Banking.Domain.ATM.Enums;
 using Banking.Domain.ATM.Errors;
@@ -98,36 +99,44 @@ public sealed class ATM : AggregateRoot<ATMId>
         return _dispenser.GetAvailableCash();
     }
 
-    public Result ReserveCash(IReadOnlyDictionary<Denomination, int> denominations)
+    public DispensePlan CreatePlan(decimal amount, ICashDispenseStrategy strategy)
+    {
+        return _dispenser.CreatePlan(amount, strategy);
+    }
+
+    public Result ReserveCash(DispensePlan plan)
     {
         if (Status != ATMStatus.Online)
         {
             return Result.Failure(ATMErrors.NotOnline);
         }
 
-        var result = _dispenser.ReserveCash(denominations);
+        var result = _dispenser.ReserveCash(plan);
 
         if (result.IsFailure)
         {
             return result;
         }
 
-        var totalAmount = denominations.Sum(d => d.Key.Value * d.Value);
-        RaiseDomainEvent(new CashReservedDomainEvent(Id, totalAmount));
+        RaiseDomainEvent(new CashReservedDomainEvent(Id, plan.TotalAmount));
         return Result.Success();
     }
 
-    public Result DispenseCash(IReadOnlyDictionary<Denomination, int> denominations)
+    public Result DispenseCash(DispensePlan plan)
     {
         if (Status != ATMStatus.Online)
         {
             return Result.Failure(ATMErrors.NotOnline);
         }
 
-        _dispenser.DispenseCash(denominations);
+        var result = _dispenser.DispenseCash(plan);
 
-        var totalAmount = denominations.Sum(d => d.Key.Value * d.Value);
-        RaiseDomainEvent(new CashDispensedDomainEvent(Id, totalAmount));
+        if (result.IsFailure)
+        {
+            return result;
+        }
+
+        RaiseDomainEvent(new CashDispensedDomainEvent(Id, plan.TotalAmount));
 
         if (!_dispenser.HasCash())
         {
