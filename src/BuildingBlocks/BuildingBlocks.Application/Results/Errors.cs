@@ -26,6 +26,9 @@ public static class Errors
 
     public static class ATM
     {
+        public static Error NotFound => new("ATM.NOT_FOUND", "ATM not found.");
+        public static Error NotOnline => new("ATM.NOT_ONLINE", "ATM is not online.");
+        public static Error CannotStart => new("ATM.CANNOT_START", "ATM cannot be started from its current status.");
         public static Error CashUnavailable => new("ATM.CASH_UNAVAILABLE", "Cash is unavailable.");
     }
 

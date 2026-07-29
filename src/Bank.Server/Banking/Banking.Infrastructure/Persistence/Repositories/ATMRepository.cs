@@ -1,5 +1,6 @@
+using ATMAggregate = Banking.Domain.ATM.Aggregate.ATM;
 using Banking.Application.Abstractions.Persistence;
-using Banking.Domain.Aggregates;
+using Banking.Domain.ATM.ValueObjects;
 using BuildingBlocks.Application.Specifications;
 using BuildingBlocks.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,40 +16,40 @@ public sealed class ATMRepository : IATMRepository
         _context = context;
     }
 
-    public async Task<ATM?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ATMAggregate?> GetByIdAsync(ATMId id, CancellationToken cancellationToken = default)
     {
         return await _context.ATMs
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsAsync(ATMId id, CancellationToken cancellationToken = default)
     {
         return await _context.ATMs.AnyAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<List<ATM>> ListAsync(ISpecification<ATM> specification, CancellationToken cancellationToken = default)
+    public async Task<List<ATMAggregate>> ListAsync(ISpecification<ATMAggregate> specification, CancellationToken cancellationToken = default)
     {
-        var query = SpecificationEvaluator.GetQuery(_context.Set<ATM>(), specification);
+        var query = SpecificationEvaluator.GetQuery(_context.Set<ATMAggregate>(), specification);
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<ATM?> FirstOrDefaultAsync(ISpecification<ATM> specification, CancellationToken cancellationToken = default)
+    public async Task<ATMAggregate?> FirstOrDefaultAsync(ISpecification<ATMAggregate> specification, CancellationToken cancellationToken = default)
     {
-        var query = SpecificationEvaluator.GetQuery(_context.Set<ATM>(), specification);
+        var query = SpecificationEvaluator.GetQuery(_context.Set<ATMAggregate>(), specification);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public void Add(ATM atm)
+    public void Add(ATMAggregate atm)
     {
         _context.ATMs.Add(atm);
     }
 
-    public void Update(ATM atm)
+    public void Update(ATMAggregate atm)
     {
         _context.ATMs.Update(atm);
     }
 
-    public void Remove(ATM atm)
+    public void Remove(ATMAggregate atm)
     {
         _context.ATMs.Remove(atm);
     }
