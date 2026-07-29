@@ -10,8 +10,11 @@ public static class ATMErrors
     public const string CannotStartMaintenance = "ATM must be online to start maintenance.";
     public const string CannotCompleteMaintenance = "ATM must be in maintenance mode to complete maintenance.";
     public const string CannotReplenish = "ATM must be online or in maintenance to replenish cash.";
-    public const string InsufficientCash = "ATM has insufficient cash to complete this operation.";
-    public const string DenominationNotFound = "The specified denomination is not available in this ATM.";
+    public const string CannotConfigureCassette = "Cassettes can only be configured while the ATM is in maintenance.";
+    public const string InsufficientCash = "Insufficient cash to complete this operation.";
+    public const string CassetteNotFound = "The specified cassette was not found in the dispenser.";
+    public const string CassetteFull = "The cassette does not have enough capacity for this replenishment.";
     public const string InvalidQuantity = "Quantity must be greater than zero.";
     public const string CashNotReserved = "The specified cash has not been reserved.";
+    public const string DenominationRequired = "At least one denomination must be specified.";
 }

@@ -5,7 +5,8 @@ namespace Banking.Domain.ATM.Events;
 
 public sealed record CashReplenishedDomainEvent(
     ATMId ATMId,
-    decimal Denomination,
+    Denomination Denomination,
+    CassetteId CassetteId,
     int Count) : IDomainEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
