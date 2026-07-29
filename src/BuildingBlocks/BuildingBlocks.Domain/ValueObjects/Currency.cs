@@ -4,36 +4,45 @@ namespace BuildingBlocks.Domain.ValueObjects;
 
 public sealed class Currency : ValueObject
 {
-    public string Code { get; }
+    public CurrencyCode Code { get; }
+    public string Name { get; }
     public string Symbol { get; }
+    public int NumericCode { get; }
+    public byte MinorUnit { get; }
 
-    private Currency(string code, string symbol)
+    private Currency(CurrencyCode code, string name, string symbol, int numericCode, byte minorUnit)
     {
         Code = code;
+        Name = name;
         Symbol = symbol;
+        NumericCode = numericCode;
+        MinorUnit = minorUnit;
     }
 
-    public static Currency Create(string code, string symbol)
+    public static Currency Create(CurrencyCode code, string name, string symbol, int numericCode, byte minorUnit)
     {
-        if (string.IsNullOrWhiteSpace(code))
+        if (code is null)
         {
-            throw new DomainException("Currency code cannot be empty.");
+            throw new DomainException("Currency code is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new DomainException("Currency name is required.");
         }
 
         if (string.IsNullOrWhiteSpace(symbol))
         {
-            throw new DomainException("Currency symbol cannot be empty.");
+            throw new DomainException("Currency symbol is required.");
         }
 
-        return new Currency(code.ToUpperInvariant(), symbol);
+        return new Currency(code, name, symbol, numericCode, minorUnit);
     }
-
-    public static readonly Currency USD = new("USD", "$");
-    public static readonly Currency EUR = new("EUR", "\u20AC");
-    public static readonly Currency EGP = new("EGP", "\u00A3");
 
     protected override IEnumerable<object?> GetEqualityComponents()
     {
         yield return Code;
     }
+
+    public override string ToString() => $"{Code} ({Name})";
 }

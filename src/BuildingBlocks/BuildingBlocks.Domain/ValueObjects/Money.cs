@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Common;
+using BuildingBlocks.Domain.Exceptions;
 
 namespace BuildingBlocks.Domain.ValueObjects;
 
@@ -53,10 +54,31 @@ public sealed class Money : ValueObject
         return new Money(-Amount, Currency);
     }
 
+    public bool IsZero()
+    {
+        return Amount == 0;
+    }
+
+    public bool IsPositive()
+    {
+        return Amount > 0;
+    }
+
+    public bool IsNegative()
+    {
+        return Amount < 0;
+    }
+
     public bool IsGreaterThan(Money other)
     {
         EnsureSameCurrency(other);
         return Amount > other.Amount;
+    }
+
+    public bool IsGreaterThanOrEqual(Money other)
+    {
+        EnsureSameCurrency(other);
+        return Amount >= other.Amount;
     }
 
     public bool IsLessThan(Money other)
@@ -65,17 +87,17 @@ public sealed class Money : ValueObject
         return Amount < other.Amount;
     }
 
-    public bool IsZero()
+    public bool IsLessThanOrEqual(Money other)
     {
-        return Amount == 0;
+        EnsureSameCurrency(other);
+        return Amount <= other.Amount;
     }
 
     private void EnsureSameCurrency(Money other)
     {
-        if (!Currency.Equals(other.Currency))
+        if (!Currency.Code.Equals(other.Currency.Code))
         {
-            throw new DomainException(
-                $"Currency mismatch: cannot operate on {Currency.Code} and {other.Currency.Code}.");
+            throw new CurrencyMismatchException(Currency.Code, other.Currency.Code);
         }
     }
 
@@ -123,13 +145,15 @@ public sealed class Money : ValueObject
 
     public static bool operator >=(Money left, Money right)
     {
-        return !left.IsLessThan(right);
+        return left.IsGreaterThanOrEqual(right);
     }
 
     public static bool operator <=(Money left, Money right)
     {
-        return !left.IsGreaterThan(right);
+        return left.IsLessThanOrEqual(right);
     }
+
+    public override string ToString() => $"{Currency.Symbol}{Amount:N2}";
 
     protected override IEnumerable<object?> GetEqualityComponents()
     {
