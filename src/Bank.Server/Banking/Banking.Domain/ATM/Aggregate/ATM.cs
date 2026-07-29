@@ -1,10 +1,11 @@
-using Banking.Domain.ATM.DomainServices;
 using Banking.Domain.ATM.Entities;
 using Banking.Domain.ATM.Enums;
 using Banking.Domain.ATM.Errors;
 using Banking.Domain.ATM.Events;
+using Banking.Domain.ATM.Services;
 using Banking.Domain.ATM.ValueObjects;
 using BuildingBlocks.Domain.Common;
+using BuildingBlocks.Domain.ValueObjects;
 
 namespace Banking.Domain.ATM.Aggregate;
 
@@ -94,42 +95,42 @@ public sealed class ATM : AggregateRoot<ATMId>
         return _dispenser.AddCassette(denomination, capacity);
     }
 
-    public decimal GetAvailableCash()
+    public bool CanDispense(Money amount, ICashDispensePlanner planner)
     {
-        return _dispenser.GetAvailableCash();
+        return Status == ATMStatus.Online && _dispenser.CanDispense(amount, planner);
     }
 
-    public DispensePlan CreatePlan(decimal amount, ICashDispenseStrategy strategy)
+    public Money GetAvailableCash(Currency currency)
     {
-        return _dispenser.CreatePlan(amount, strategy);
+        return _dispenser.GetAvailableCash(currency);
     }
 
-    public Result ReserveCash(DispensePlan plan)
+    public Result<DispensePlan> ReserveCash(Money amount, ICashDispensePlanner planner)
     {
         if (Status != ATMStatus.Online)
         {
-            return Result.Failure(ATMErrors.NotOnline);
+            return Result<DispensePlan>.Failure(ATMErrors.NotOnline);
         }
 
-        var result = _dispenser.ReserveCash(plan);
+        var result = _dispenser.ReserveCash(amount, planner);
 
         if (result.IsFailure)
         {
             return result;
         }
 
-        RaiseDomainEvent(new CashReservedDomainEvent(Id, plan.TotalAmount));
-        return Result.Success();
+        RaiseDomainEvent(new CashReservedDomainEvent(Id, result.Value!.TotalAmount));
+        return result;
     }
 
-    public Result DispenseCash(DispensePlan plan)
+    public Result ExecutePlan(DispensePlan plan)
     {
         if (Status != ATMStatus.Online)
         {
             return Result.Failure(ATMErrors.NotOnline);
         }
 
-        var result = _dispenser.DispenseCash(plan);
+        var result = _dispenser.ExecutePlan(plan);
 
         if (result.IsFailure)
         {

@@ -1,6 +1,7 @@
-using Banking.Domain.ATM.DomainServices;
+using Banking.Domain.ATM.Services;
 using Banking.Domain.ATM.ValueObjects;
 using BuildingBlocks.Domain.Common;
+using BuildingBlocks.Domain.ValueObjects;
 
 namespace Banking.Domain.ATM.Entities;
 
@@ -31,63 +32,74 @@ public sealed class CashDispenser : Entity<Guid>
         return Result.Success();
     }
 
-    public DispensePlan CreatePlan(decimal amount, ICashDispenseStrategy strategy)
+    public bool CanDispense(Money amount, ICashDispensePlanner planner)
     {
-        var cassetteInfos = _cassettes
-            .Select(c => new CassetteInfo(c.Denomination, c.AvailableCount))
-            .ToList();
+        if (amount.IsZero() || amount.IsNegative())
+        {
+            return false;
+        }
 
-        return strategy.CreatePlan(amount, cassetteInfos);
+        var planResult = planner.CreatePlan(_cassettes, amount);
+        return planResult.IsSuccess && !planResult.Value!.IsEmpty;
     }
 
-    public Result ReserveCash(DispensePlan plan)
+    public Result<DispensePlan> ReserveCash(Money amount, ICashDispensePlanner planner)
     {
-        if (plan.IsEmpty)
+        if (amount.IsZero() || amount.IsNegative())
         {
-            return Result.Failure("Cannot reserve an empty plan.");
+            return Result<DispensePlan>.Failure("Amount must be positive.");
         }
+
+        var planResult = planner.CreatePlan(_cassettes, amount);
+
+        if (planResult.IsFailure)
+        {
+            return planResult;
+        }
+
+        var plan = planResult.Value!;
 
         foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(item.Denomination));
+            var cassette = _cassettes.FirstOrDefault(c => c.Id.Equals(item.CassetteId));
 
             if (cassette is null)
             {
-                return Result.Failure("Plan references a denomination not present in the dispenser.");
+                return Result<DispensePlan>.Failure("Plan references a cassette not present in the dispenser.");
             }
 
-            if (!cassette.CanReserve(item.Quantity))
+            if (!cassette.CanReserve(item.BillCount))
             {
-                return Result.Failure("Insufficient available cash to complete this reservation.");
+                return Result<DispensePlan>.Failure("Insufficient available cash to complete this reservation.");
             }
         }
 
         foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
-            cassette.Reserve(item.Quantity);
+            var cassette = _cassettes.First(c => c.Id.Equals(item.CassetteId));
+            cassette.Reserve(item.BillCount);
         }
 
-        return Result.Success();
+        return Result<DispensePlan>.Success(plan);
     }
 
-    public Result DispenseCash(DispensePlan plan)
+    public Result ExecutePlan(DispensePlan plan)
     {
         if (plan.IsEmpty)
         {
-            return Result.Failure("Cannot dispense an empty plan.");
+            return Result.Failure("Cannot execute an empty plan.");
         }
 
         foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.FirstOrDefault(c => c.Denomination.Equals(item.Denomination));
+            var cassette = _cassettes.FirstOrDefault(c => c.Id.Equals(item.CassetteId));
 
             if (cassette is null)
             {
-                return Result.Failure("Plan references a denomination not present in the dispenser.");
+                return Result.Failure("Plan references a cassette not present in the dispenser.");
             }
 
-            if (cassette.ReservedCount < item.Quantity)
+            if (cassette.ReservedCount < item.BillCount)
             {
                 return Result.Failure("Cannot dispense more than the reserved quantity.");
             }
@@ -95,20 +107,11 @@ public sealed class CashDispenser : Entity<Guid>
 
         foreach (var item in plan.Items)
         {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
-            cassette.Dispense(item.Quantity);
+            var cassette = _cassettes.First(c => c.Id.Equals(item.CassetteId));
+            cassette.Dispense(item.BillCount);
         }
 
         return Result.Success();
-    }
-
-    public void ReleaseCash(DispensePlan plan)
-    {
-        foreach (var item in plan.Items)
-        {
-            var cassette = _cassettes.First(c => c.Denomination.Equals(item.Denomination));
-            cassette.Release(item.Quantity);
-        }
     }
 
     public Result ReplenishCassette(CassetteId cassetteId, int count)
@@ -124,9 +127,10 @@ public sealed class CashDispenser : Entity<Guid>
         return Result.Success();
     }
 
-    public decimal GetAvailableCash()
+    public Money GetAvailableCash(Currency currency)
     {
-        return _cassettes.Sum(c => c.Denomination.Value * c.AvailableCount);
+        var total = _cassettes.Sum(c => c.Denomination.Value * c.AvailableCount);
+        return Money.Create(total, currency);
     }
 
     public bool HasCash()
